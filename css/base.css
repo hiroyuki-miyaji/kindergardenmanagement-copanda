@@ -1,0 +1,39 @@
+body {
+    font-family: sans-serif;
+    padding: 20px;
+    background: #faf7ef;
+}
+
+h2, h3 {
+    text-align: center;
+}
+
+.form-block {
+    max-width: 380px;
+    margin: auto;
+}
+
+input, button {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0;
+    font-size: 16px;
+}
+
+button {
+    background: #c93056;
+    color: white;
+    border: none;
+    border-radius: 6px;
+}
+
+.menu-btn {
+    display: block;
+    padding: 12px;
+    background: #c93056;
+    color: white;
+    margin: 10px;
+    text-align: center;
+    border-radius: 6px;
+    text-decoration: none;
+}
