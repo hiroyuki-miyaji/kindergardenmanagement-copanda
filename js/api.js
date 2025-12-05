@@ -1,8 +1,8 @@
 /****************************************************
  * 設定
  ****************************************************/
-const LIFF_ID = "あなたのLIFF_ID";
-const API_URL = "あなたのLogicAppsエンドポイント";  // ←ここを書き換える
+const LIFF_ID = "2008634162-jVqAPKrD";
+const API_URL = "https://prod-34.japaneast.logic.azure.com:443/workflows/d051b8af896d4c2eab42b3929e8514a8/triggers/When_an_HTTP_request_is_received/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2FWhen_an_HTTP_request_is_received%2Frun&sv=1.0&sig=_TeZqNvJsSsEygHw8yuFTTrwRoM9lRHKgtZklxUS4rU";  // ←ここを書き換える
 
 
 /****************************************************
