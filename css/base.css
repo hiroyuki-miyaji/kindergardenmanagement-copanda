@@ -70,15 +70,20 @@ button {
 /* =========================================
    スマホ（縦並び）
 ========================================= */
+/* ---- スマホ（縦並び・中央揃え） ---- */
 @media screen and (max-width: 767px) {
     .menu-container {
-        display: block;
-        margin-top: 15px;
+        display: flex;
+        flex-direction: column; /* ← 縦並び強制 */
+        align-items: center;    /* ← 真ん中寄せ */
+        gap: 15px;              /* ← ボタン間の余白 */
+        width: 100%;
     }
 
     .menu-btn {
-        width: 90%;
-        margin: 12px auto;     /* 中央寄せ & 間隔 */
+        width: 90%;             /* ← スマホは画面の90%幅 */
+        max-width: 380px;       /* ← 大きすぎ防止 */
+        margin: 0 auto;
     }
 }
 
