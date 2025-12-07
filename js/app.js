@@ -102,6 +102,7 @@ async function initRegisterPage() {
     if (!profile) return;
 
     const lineId = profile.userId;
+    const msg = document.getElementById("msg"); // ← これがないとボタンが動かない
 
     document.getElementById("btnRegister").onclick = async () => {
         const authCode = document.getElementById("authCode").value;
