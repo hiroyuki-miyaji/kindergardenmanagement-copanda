@@ -49,12 +49,11 @@ async function callApi(body) {
 
 /****************************************************
  * index.html ロジック
- *   1. LIFFログイン
- *   2. LINEIDで保護者チェック
- *   3. 未登録 → register_guardian.htmlへ
  ****************************************************/
 async function initIndexPage() {
-    const main = document.getElementById("main");
+    const loading = document.getElementById("loading");
+    const menu = document.getElementById("menu");
+    const guardianNameLabel = document.getElementById("guardianName");
 
     const profile = await initLIFF();
     if (!profile) return;
@@ -66,31 +65,24 @@ async function initIndexPage() {
         lineId: lineId
     });
 
+    // 通信エラー
     if (result.error) {
-        main.innerHTML = "<p>通信エラーが発生しました。</p>";
+        loading.innerHTML = "<p>通信エラーが発生しました。</p>";
         return;
     }
 
-    // 未登録 → 初回登録画面へ
+    // 未登録 → 初回登録へ
     if (!result.exists) {
         window.location.href = "register_guardian.html";
         return;
     }
 
-    // 登録済み → メニュー表示
-    main.innerHTML = `
-        <h3>${result.guardianName} さん</h3>
-        <p>連絡内容を選択してください</p>
+    // HTML に名前を差し込み
+    guardianNameLabel.textContent = `${result.guardianName} さん`;
 
-        <a class="menu-btn" href="contact_form.html?type=absence">欠席連絡</a>
-        <a class="menu-btn" href="contact_form.html?type=tardy">遅刻連絡</a>
-        <a class="menu-btn" href="contact_form.html?type=early">早退連絡</a>
-        <a class="menu-btn" href="contact_form.html?type=bus">バスキャンセル</a>
-        <a class="menu-btn" href="contact_form.html?type=hoiku">預かり保育予約</a>
-
-        <hr />
-        <a href="contact_list.html">連絡履歴を見る</a>
-    `;
+    // 画面切り替え
+    loading.style.display = "none";
+    menu.style.display = "block";
 }
 
 
