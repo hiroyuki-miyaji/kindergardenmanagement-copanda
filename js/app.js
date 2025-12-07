@@ -120,7 +120,7 @@ async function initRegisterPage() {
             email: email
         });
 
-        if (res.result === "ok") {
+        if (res.result === "success") {
             msg.textContent = "登録が完了しました。";
             setTimeout(() => (window.location.href = "index.html"), 700);
         } else {
