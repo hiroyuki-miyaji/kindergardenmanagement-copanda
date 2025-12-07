@@ -1,13 +1,29 @@
+/* =========================================
+   全体レイアウト
+========================================= */
 body {
     font-family: sans-serif;
     padding: 20px;
     background: #faf7ef;
+    margin: 0;
 }
 
+/* タイトル中央揃え */
 h2, h3 {
     text-align: center;
 }
 
+/* メインコンテンツ中央寄せ */
+#menu {
+    max-width: 900px;   /* PC でも中央にまとまる */
+    margin: 0 auto;
+    text-align: center;
+}
+
+
+/* =========================================
+   入力フォーム
+========================================= */
 .form-block {
     max-width: 380px;
     margin: auto;
@@ -28,42 +44,59 @@ button {
     cursor: pointer;
 }
 
+
+/* =========================================
+   メニューボタン（共通）
+========================================= */
 .menu-btn {
     display: block;
-    padding: 12px;
+    padding: 14px;
     background: #c93056;
     color: white;
     text-align: center;
     border-radius: 6px;
     text-decoration: none;
+    font-size: 16px;
+    font-weight: 600;
+    transition: 0.2s;
 }
 
-/* ---- PC でボタン横並び ---- */
-@media screen and (min-width: 768px) {
-    .menu-container {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 12px;
-        justify-content: center;
-        max-width: 900px;          /* ← これを追加すると中央にまとまる */
-        margin: 0 auto;
-    }
-
-    .menu-btn {
-        width: 200px;              /* 横並び用 */
-        margin: 0;                 /* PC の余白調整 */
-    }
+/* マウスホバー */
+.menu-btn:hover {
+    opacity: 0.85;
 }
 
-/* ---- スマホでは従来どおり縦並び ---- */
+
+/* =========================================
+   スマホ（縦並び）
+========================================= */
 @media screen and (max-width: 767px) {
     .menu-container {
         display: block;
+        margin-top: 15px;
     }
 
     .menu-btn {
-        width: 100%;               /* ← スマホだけ 100% にする */
-        margin-bottom: 15px;
+        width: 90%;
+        margin: 12px auto;     /* 中央寄せ & 間隔 */
     }
 }
 
+
+/* =========================================
+   PC（横並び）
+========================================= */
+@media screen and (min-width: 768px) {
+    .menu-container {
+        display: flex;
+        flex-wrap: wrap;       /* 2列・3列にもなる */
+        justify-content: center;
+        gap: 20px;             /* ボタン同士の間隔 */
+        margin-top: 20px;
+    }
+
+    .menu-btn {
+        width: 220px;          /* PC のボタン幅 */
+        margin: 0;
+    }
+}
