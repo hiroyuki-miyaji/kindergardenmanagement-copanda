@@ -33,11 +33,11 @@ button {
     padding: 12px;
     background: #c93056;
     color: white;
-    margin: 10px;
     text-align: center;
     border-radius: 6px;
     text-decoration: none;
 }
+
 /* ---- PC でボタン横並び ---- */
 @media screen and (min-width: 768px) {
     .menu-container {
@@ -45,11 +45,13 @@ button {
         flex-wrap: wrap;
         gap: 12px;
         justify-content: center;
+        max-width: 900px;          /* ← これを追加すると中央にまとまる */
+        margin: 0 auto;
     }
 
     .menu-btn {
-        width: 200px;     /* お好みで調整 */
-        margin: 0;
+        width: 200px;              /* 横並び用 */
+        margin: 0;                 /* PC の余白調整 */
     }
 }
 
@@ -60,7 +62,7 @@ button {
     }
 
     .menu-btn {
-        width: 100%;
+        width: 100%;               /* ← スマホだけ 100% にする */
         margin-bottom: 15px;
     }
 }
