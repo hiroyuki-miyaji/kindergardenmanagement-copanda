@@ -1,4 +1,4 @@
-/****************************************************
+x/****************************************************
  * 設定
  ****************************************************/
 const LIFF_ID = "2008634162-jVqAPKrD";
@@ -106,7 +106,6 @@ async function initRegisterPage() {
     document.getElementById("btnRegister").onclick = async () => {
         const authCode = document.getElementById("authCode").value;
         const email = document.getElementById("email").value;
-        const msg = document.getElementById("msg");
 
         if (!authCode || !email) {
             msg.textContent = "未入力の項目があります。";
