@@ -51,7 +51,7 @@ async function callApi(body) {
  * index.html ロジック
  *   1. LIFFログイン
  *   2. LINEIDで保護者チェック
- *   3. 未登録 → register_parent.htmlへ
+ *   3. 未登録 → register_guardian.htmlへ
  ****************************************************/
 async function initIndexPage() {
     const main = document.getElementById("main");
@@ -73,7 +73,7 @@ async function initIndexPage() {
 
     // 未登録 → 初回登録画面へ
     if (!result.exists) {
-        window.location.href = "register_parent.html";
+        window.location.href = "register_guardian.html";
         return;
     }
 
@@ -95,7 +95,7 @@ async function initIndexPage() {
 
 
 /****************************************************
- * register_parent.html ロジック
+ * register_guardian.html ロジック
  ****************************************************/
 async function initRegisterPage() {
     const profile = await initLIFF();
@@ -137,7 +137,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (path.endsWith("index.html") || path.endsWith("/")) {
         initIndexPage();
-    } else if (path.endsWith("register_parent.html")) {
+    } else if (path.endsWith("register_guardian.html")) {
         initRegisterPage();
     }
 });
