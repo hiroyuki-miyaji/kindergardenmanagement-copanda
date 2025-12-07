@@ -38,3 +38,30 @@ button {
     border-radius: 6px;
     text-decoration: none;
 }
+/* ---- PC でボタン横並び ---- */
+@media screen and (min-width: 768px) {
+    .menu-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        justify-content: center;
+    }
+
+    .menu-btn {
+        width: 200px;     /* お好みで調整 */
+        margin: 0;
+    }
+}
+
+/* ---- スマホでは従来どおり縦並び ---- */
+@media screen and (max-width: 767px) {
+    .menu-container {
+        display: block;
+    }
+
+    .menu-btn {
+        width: 100%;
+        margin-bottom: 15px;
+    }
+}
+
