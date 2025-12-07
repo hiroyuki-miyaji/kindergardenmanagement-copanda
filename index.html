@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="css/base.css" />
 
     <script src="https://static.line-scdn.net/liff/edge/versions/2.21.2/sdk.js"></script>
-    <script src="./js/app.js?v=2"></script>
+    <script src="./js/app.js?v=3"></script>
 </head>
 
 <body>
@@ -15,7 +15,29 @@
 </header>
 
 <main id="main">
-    <p>読み込み中...</p>
+
+    <!-- 読み込み中 -->
+    <div id="loading">
+        <p>読み込み中...</p>
+    </div>
+
+    <!-- メニュー（初期は隠す） -->
+    <div id="menu" style="display:none;">
+        <h3 id="guardianName"></h3>
+        <p>連絡内容を選択してください</p>
+
+        <div class="menu-container">
+            <a class="menu-btn" href="contact_form.html?type=absence">欠席連絡</a>
+            <a class="menu-btn" href="contact_form.html?type=tardy">遅刻連絡</a>
+            <a class="menu-btn" href="contact_form.html?type=early">早退連絡</a>
+            <a class="menu-btn" href="contact_form.html?type=bus">バスキャンセル</a>
+            <a class="menu-btn" href="contact_form.html?type=hoiku">預かり保育予約</a>
+        </div>
+
+        <hr/>
+        <a href="contact_list.html">連絡履歴を見る</a>
+    </div>
+
 </main>
 
 </body>
