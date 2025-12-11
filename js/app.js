@@ -127,7 +127,7 @@ async function loadUpcomingContacts() {
 
     res.items.forEach(c => {
         const li = document.createElement("li");
-        li.textContent = `${c.date}：${c.type}`;
+        li.textContent = `${c.date}：${c.name}：${c.type}`;
         ul.appendChild(li);
     });
 }
