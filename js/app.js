@@ -2,7 +2,11 @@
  * 設定
  ****************************************************/
 const LIFF_ID = "2008634162-jVqAPKrD";
-const API_URL = "https://prod-13.japaneast.logic.azure.com:443/workflows/7d86cca357d74a499d659ccfddac499c/triggers/When_an_HTTP_request_is_received/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2FWhen_an_HTTP_request_is_received%2Frun&sv=1.0&sig=qalRj8hNDNVdcAXhZ7cpC6KahERkg5W3NcBcPseEl14";  // ←ここを書き換える
+const API_URL =
+  "https://prod-13.japaneast.logic.azure.com:443/workflows/7d86cca357d74a499d659ccfddac499c/triggers/When_an_HTTP_request_is_received/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2FWhen_an_HTTP_request_is_received%2Frun&sv=1.0&sig=qalRj8hNDNVdcAXhZ7cpC6KahERkg5W3NcBcPseEl14";
+
+// ★ 認証後に保存する authcode
+let AUTH_CODE = null;
 
 
 /****************************************************
@@ -21,7 +25,7 @@ async function initLIFF() {
 
 
 /****************************************************
- * LogicApps 統合 API 呼び出し
+ * LogicApps API 呼び出し
  ****************************************************/
 async function callApi(body) {
     console.log("API Request:", body);
@@ -60,29 +64,62 @@ async function initIndexPage() {
 
     const lineId = profile.userId;
 
+    // ★ LINEID → authcode の取得
     const result = await callApi({
         action: "check_guardian",
         lineId: lineId
     });
 
-    // 通信エラー
     if (result.error) {
         loading.innerHTML = "<p>通信エラーが発生しました。</p>";
         return;
     }
 
-    // 未登録 → 初回登録へ
     if (!result.exists) {
         window.location.href = "register_guardian.html";
         return;
     }
 
-    // HTML に名前を差し込み
     guardianNameLabel.textContent = `${result.guardianName} さん`;
 
-    // 画面切り替え
+    // ★ authcode を保持
+    AUTH_CODE = result.authcode;
+
     loading.style.display = "none";
     menu.style.display = "block";
+
+    // ★ authcode を使い、本日以降の連絡を取得
+    loadUpcomingContacts();
+}
+
+
+/****************************************************
+ * 本日以降の連絡一覧を取得して表示
+ ****************************************************/
+async function loadUpcomingContacts() {
+    if (!AUTH_CODE) return;
+
+    const today = new Date().toISOString().slice(0, 10);
+
+    const res = await callApi({
+        action: "get_contacts",
+        authCode: AUTH_CODE,
+        dateFrom: today
+    });
+
+    const ul = document.getElementById("contactList");
+    ul.innerHTML = "";
+
+    if (!res.items || res.items.length === 0) {
+        ul.innerHTML = "<li>本日以降の連絡はありません</li>";
+        return;
+    }
+
+    res.items.forEach(c => {
+        const li = document.createElement("li");
+        li.textContent = `${c.date}：${c.type}`;
+        ul.appendChild(li);
+    });
 }
 
 
@@ -94,7 +131,7 @@ async function initRegisterPage() {
     if (!profile) return;
 
     const lineId = profile.userId;
-    const msg = document.getElementById("msg"); // ← これがないとボタンが動かない
+    const msg = document.getElementById("msg");
 
     document.getElementById("btnRegister").onclick = async () => {
         const authCode = document.getElementById("authCode").value;
