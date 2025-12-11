@@ -218,7 +218,7 @@ async function initContactListPage() {
 
     res.items.forEach(c => {
         const li = document.createElement("li");
-        li.textContent = `${c.date}：${c.type}（${c.childName ?? ""}）`;
+        li.textContent = `${c.date}：${c.type}：${c.name ?? ""}`;
         ul.appendChild(li);
     });
 }
