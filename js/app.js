@@ -99,9 +99,15 @@ async function initIndexPage() {
 async function loadUpcomingContacts() {
     if (!AUTH_CODE) return;
 
-    const today = new Date().toISOString().slice(0, 10);
+    const now = new Date();
+    const jst = new Date(now.getTime() + 9 * 60 * 60 * 1000);
+    const year = jst.getUTCFullYear();
+    const month = String(jst.getUTCMonth() + 1).padStart(2, "0");
+    const day = String(jst.getUTCDate()).padStart(2, "0");
+    const today = `${year}-${month}-${day}`;
 
-    const res = await callApi({
+  
+  const res = await callApi({
         action: "get_contacts",
         authCode: AUTH_CODE,
         dateFrom: today
