@@ -10,6 +10,17 @@ let AUTH_CODE = null;
 
 
 /****************************************************
+ * localStorage から AUTH_CODE を復元
+ ****************************************************/
+function restoreAuthCode() {
+    const saved = localStorage.getItem("AUTH_CODE");
+    if (saved) {
+        AUTH_CODE = saved;
+        console.log("RESTORED AUTH_CODE:", AUTH_CODE);
+    }
+}
+
+/****************************************************
  * LIFF 初期化
  ****************************************************/
 async function initLIFF() {
@@ -59,6 +70,8 @@ async function initIndexPage() {
     const menu = document.getElementById("menu");
     const guardianNameLabel = document.getElementById("guardianName");
 
+    restoreAuthCode();  // ★ まず復元
+  
     const profile = await initLIFF();
     if (!profile) return;
 
@@ -84,6 +97,7 @@ async function initIndexPage() {
 
     // ★ authcode を保持
     AUTH_CODE = result.authcode;
+    localStorage.setItem("AUTH_CODE", AUTH_CODE);
 
     loading.style.display = "none";
     menu.style.display = "block";
@@ -179,6 +193,8 @@ async function initContactListPage() {
 
     await initLIFF();
 
+    restoreAuthCode();  // ★ ここでも復元する
+
     if (!AUTH_CODE) {
         loading.innerHTML = "<p>認証情報がありません。</p>";
         return;
@@ -211,6 +227,8 @@ async function initContactListPage() {
  * ページ判定 & 初期化実行
  ****************************************************/
 document.addEventListener("DOMContentLoaded", () => {
+    restoreAuthCode();  // ← ページ読み込み時に復元
+
     const path = location.pathname;
 
     if (path.endsWith("index.html") || path.endsWith("/")) {
