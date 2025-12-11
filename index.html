@@ -4,11 +4,13 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>幼稚園連絡サービス</title>
+
     <link rel="stylesheet" href="./css/base.css?v=3" />
 
     <script src="https://static.line-scdn.net/liff/edge/versions/2.21.2/sdk.js"></script>
-    <script src="./js/app.js?v=3"></script>
+    <script src="./js/app.js?v=4"></script>
 </head>
+
 <body>
 <header>
     <h2>幼稚園連絡サービス</h2>
@@ -23,8 +25,17 @@
 
     <!-- メニュー（初期は隠す） -->
     <div id="menu" style="display:none;">
+
         <h3 id="guardianName"></h3>
         <p>連絡内容を選択してください</p>
+
+        <!-- ★ 本日以降の連絡一覧エリア -->
+        <div id="upcomingBox" style="margin-top: 30px;">
+            <h4>本日以降の連絡</h4>
+            <ul id="contactList"></ul>
+        </div>
+        <a href="contact_list.html">連絡履歴を見る</a>
+        <hr/>
 
         <div class="menu-container">
             <a class="menu-btn" href="contact_form.html?type=absence">欠席連絡</a>
@@ -34,8 +45,6 @@
             <a class="menu-btn" href="contact_form.html?type=hoiku">預かり保育予約</a>
         </div>
 
-        <hr/>
-        <a href="contact_list.html">連絡履歴を見る</a>
     </div>
 
 </main>
