@@ -224,20 +224,45 @@ async function initContactListPage() {
 }
 
 /****************************************************
+ * contact_form.html（統一フォーム）から利用するAPIラッパ
+ ****************************************************/
+async function apiGetKids() {
+    return await callApi({
+        action: "get_kids",
+        authCode: AUTH_CODE
+    });
+}
+
+async function apiGetCalendar(contactType, className) {
+    return await callApi({
+        action: "get_calendar",
+        contactType: contactType,
+        className: className
+    });
+}
+
+async function apiSubmitContact(payload) {
+    payload.action = "submit_contact";
+    payload.authCode = AUTH_CODE;
+    return await callApi(payload);
+}
+
+
+/****************************************************
  * ページ判定 & 初期化実行
  ****************************************************/
 document.addEventListener("DOMContentLoaded", () => {
-    restoreAuthCode();  // ← ページ読み込み時に復元
 
     const path = location.pathname;
 
     if (path.endsWith("index.html") || path.endsWith("/")) {
         initIndexPage();
-    } 
+    }
     else if (path.endsWith("register_guardian.html")) {
         initRegisterPage();
     }
     else if (path.endsWith("contact_list.html")) {
         initContactListPage();
     }
+    // contact_form.html は contact_form.js 側が制御
 });
