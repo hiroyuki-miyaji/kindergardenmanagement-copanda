@@ -175,8 +175,9 @@ async function initContactListPage() {
     }
 
     const res = await callApi({
-        action: "get_contact_history",
-        authCode: AUTH_CODE
+        action: "get_contact",
+        authCode: AUTH_CODE,
+        dateFrom:1970-01-01
     });
 
     loading.style.display = "none";
