@@ -201,7 +201,7 @@ async function initContactListPage() {
     }
 
     const res = await callApi({
-        action: "get_contact",
+        action: "get_contacts",
         authCode: AUTH_CODE,
         dateFrom:1970-01-01
     });
