@@ -158,6 +158,43 @@ async function initRegisterPage() {
     };
 }
 
+/****************************************************
+ * contact_list.html：連絡履歴一覧を取得して表示
+ ****************************************************/
+async function initContactListPage() {
+
+    const loading = document.getElementById("loading");
+    const historyBox = document.getElementById("historyBox");
+    const ul = document.getElementById("historyList");
+
+    await initLIFF();
+
+    if (!AUTH_CODE) {
+        loading.innerHTML = "<p>認証情報がありません。</p>";
+        return;
+    }
+
+    const res = await callApi({
+        action: "get_contact_history",
+        authCode: AUTH_CODE
+    });
+
+    loading.style.display = "none";
+    historyBox.style.display = "block";
+
+    ul.innerHTML = "";
+
+    if (!res.items || res.items.length === 0) {
+        ul.innerHTML = "<li>連絡履歴はありません</li>";
+        return;
+    }
+
+    res.items.forEach(c => {
+        const li = document.createElement("li");
+        li.textContent = `${c.date}：${c.type}（${c.childName ?? ""}）`;
+        ul.appendChild(li);
+    });
+}
 
 /****************************************************
  * ページ判定 & 初期化実行
@@ -167,7 +204,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (path.endsWith("index.html") || path.endsWith("/")) {
         initIndexPage();
-    } else if (path.endsWith("register_guardian.html")) {
+    } 
+    else if (path.endsWith("register_guardian.html")) {
         initRegisterPage();
+    }
+    else if (path.endsWith("contact_list.html")) {
+        initContactListPage();
     }
 });
