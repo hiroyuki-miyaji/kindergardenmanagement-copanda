@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>連絡フォーム</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="apps.js"></script>
+    <script src="contact_form.js" defer></script>
+</head>
+
+<body>
+
+    <h2 id="title"></h2>
+
+    <!-- STEP1：園児選択 -->
+    <div id="stepKid">
+        <p>園児を選んでください</p>
+        <div id="kidList"></div>
+    </div>
+
+    <!-- STEP2：日付選択（カレンダー制御あり） -->
+    <div id="stepDate" style="display:none;">
+        <p>日程</p>
+        <input type="date" id="inputDate">
+    </div>
+
+    <!-- STEP3：フォーム本体（動的制御） -->
+    <div id="stepForm" style="display:none;">
+
+        <!-- 遅刻・早退のみ -->
+        <div id="fld_time"><p>時間</p><input type="time" id="time"></div>
+
+        <!-- 理由 -->
+        <div id="fld_reason">
+            <p>理由</p>
+            <label><input type="radio" name="reason" value="私用">私用</label>
+            <label><input type="radio" name="reason" value="通院">通院</label>
+            <label><input type="radio" name="reason" value="寝坊">寝坊</label>
+            <label><input type="radio" name="reason" value="その他">その他</label>
+        </div>
+
+        <!-- バス -->
+        <div id="fld_bus">
+            <p>バス区分</p>
+            <select id="bus">
+                <option value="">選択してください</option>
+                <option value="行きのみ">行きのみ</option>
+                <option value="帰りのみ">帰りのみ</option>
+                <option value="両方">両方</option>
+            </select>
+        </div>
+
+        <!-- 給食（遅刻のみ） -->
+        <div id="fld_lunch">
+            <p>給食</p>
+            <label><input type="radio" name="lunch" value="必要">必要</label>
+            <label><input type="radio" name="lunch" value="不要">不要</label>
+        </div>
+
+        <!-- 預かり保育メニュー -->
+        <div id="fld_menu">
+            <p>メニュー</p>
+            <select id="menu"></select>
+        </div>
+
+        <!-- 備考 -->
+        <div id="fld_memo">
+            <p>備考</p>
+            <textarea id="memo"></textarea>
+        </div>
+
+        <div class="button-row">
+            <button onclick="history.back()">戻る</button>
+            <button id="btnSubmit">送信</button>
+        </div>
+    </div>
+
+</body>
+</html>
