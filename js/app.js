@@ -94,23 +94,27 @@ async function initIndexPage() {
 
 
 /****************************************************
- * 本日以降の連絡一覧を取得して表示
+ * 本日以降の連絡一覧を取得して表示（JSTで送信）
  ****************************************************/
 async function loadUpcomingContacts() {
     if (!AUTH_CODE) return;
 
+    // JST の今日を生成
     const now = new Date();
     const jst = new Date(now.getTime() + 9 * 60 * 60 * 1000);
+
     const year = jst.getUTCFullYear();
     const month = String(jst.getUTCMonth() + 1).padStart(2, "0");
     const day = String(jst.getUTCDate()).padStart(2, "0");
-    const today = `${year}-${month}-${day}`;
 
-  
-  const res = await callApi({
+    const todayJST = `${year}-${month}-${day}`;  // 例: 2025-12-11
+
+    console.log("JST dateFrom:", todayJST);
+
+    const res = await callApi({
         action: "get_contacts",
         authCode: AUTH_CODE,
-        dateFrom: today
+        dateFrom: todayJST      // ← JST を送信（正しい）
     });
 
     const ul = document.getElementById("contactList");
