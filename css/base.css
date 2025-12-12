@@ -1,17 +1,18 @@
 /* ================================
-   基本デザイン
-================================= */
-
+   基本デザイン（既存）
+================================ */
 body {
     font-family: sans-serif;
     padding: 20px;
     background: #faf7ef;
+    margin: 0;
 }
 
-h2, h3 {
+h1, h2, h3 {
     text-align: center;
 }
 
+/* メニュー共通 */
 .menu-btn {
     display: block;
     padding: 12px;
@@ -24,30 +25,145 @@ h2, h3 {
 
 
 /* ================================
-   スマホ版（最優先で縦並び）
-================================= */
-@media screen and (max-width: 767px) {
+   ★ 連絡フォーム（追加）
+================================ */
 
+/* コンテナ */
+.container {
+    max-width: 760px;
+    margin: 0 auto;
+    background: white;
+    padding: 20px 18px 40px 18px;
+    border-radius: 8px;
+}
+
+/* セクション */
+.section {
+    margin-bottom: 22px;
+}
+
+/* ラベル */
+.label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 6px;
+    font-size: 15px;
+}
+
+/* テキスト入力 */
+.input-text {
+    width: 100%;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 15px;
+    box-sizing: border-box;
+}
+
+/* セレクト */
+.input-select {
+    width: 100%;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 15px;
+    box-sizing: border-box;
+}
+
+/* テキストエリア */
+.textarea {
+    width: 100%;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    min-height: 70px;
+    font-size: 15px;
+    box-sizing: border-box;
+}
+
+/* ラジオ・チェックボックスグループ */
+.radio-group label,
+.checkbox-group label {
+    display: block;
+    padding: 4px 0;
+    font-size: 15px;
+}
+
+/* 園児選択エリア（横並び→スマホ縦並び対応） */
+.kids-area {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px 24px;
+}
+
+.kids-area label {
+    font-size: 16px;
+}
+
+/* ボタンエリア */
+.btn-area {
+    margin-top: 32px;
+    display: flex;
+    justify-content: center;
+    gap: 18px;
+}
+
+/* ボタン */
+.btn {
+    padding: 12px 28px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.btn-back {
+    background: #ddd;
+}
+
+.btn-send {
+    background: #c93056;
+    color: white;
+}
+
+/* 非表示 */
+.hidden {
+    display: none !important;
+}
+
+
+/* ================================
+   メニュー UI（既存）
+================================ */
+
+/* スマホ版 */
+@media screen and (max-width: 767px) {
     .menu-container {
-        display: block !important;     /* ← 横並びを完全停止 */
+        display: block !important;
         width: 100%;
         text-align: center;
     }
 
     .menu-btn {
-        width: 90% !important;         /* ← スマホの幅いっぱいに */
+        width: 90% !important;
         max-width: 380px !important;
         margin: 0 auto 15px auto !important;
         font-size: 16px;
     }
+
+    /* フォームのスマホ調整 */
+    .container {
+        padding: 16px;
+    }
+
+    .btn {
+        width: 46%;
+        padding: 12px 0;
+    }
 }
 
-
-/* ================================
-   PC 版（横並び）
-================================= */
+/* PC版 */
 @media screen and (min-width: 768px) {
-
     .menu-container {
         display: flex;
         flex-wrap: wrap;
