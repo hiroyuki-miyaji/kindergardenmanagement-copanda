@@ -63,7 +63,7 @@ async function loadKids() {
 
     res.kids.forEach(k => {
         box.innerHTML += `
-            <label><input type="radio" name="kid" value="${k.id}" data-class="${k.class}" id="${k.id}">${k.name}</label>
+            <label><input type="radio" name="kid" value="${k.kidsid}" data-class="${k.class}" id="${k.id}">${k.name}</label>
         `;
     });
 
