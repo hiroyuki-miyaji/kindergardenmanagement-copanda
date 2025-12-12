@@ -1,79 +1,113 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <title>連絡フォーム</title>
-    <link rel="stylesheet" href="./css/base.css">
-    <script src="./js/app.js"></script>
-    <script src="./js/contact_form.js" defer></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>連絡フォーム</title>
+
+<!-- 既存のベースCSS -->
+<link rel="stylesheet" href="base.css">
+
+<!-- contact_form専用スタイル -->
+<link rel="stylesheet" href="contact_form.css">
+
 </head>
 
 <body>
 
-    <h2 id="title"></h2>
+<div class="container">
 
-    <!-- STEP1：園児選択 -->
-    <div id="stepKid">
-        <p>園児を選んでください</p>
-        <div id="kidList"></div>
+  <!-- タイトル（JSで「欠席連絡」「遅刻連絡」などに書き換え） -->
+  <h1 id="formTitle" class="form-title">連絡</h1>
+
+  <!-- ▼ 園児選択 -->
+  <div class="section">
+    <label class="label">園児を選んでください</label>
+    <div id="kidsArea" class="kids-area"></div>
+  </div>
+
+  <!-- ▼ 日付 -->
+  <div class="section">
+    <label class="label">日程</label>
+    <input type="text" id="dateInput" class="input-text" readonly>
+  </div>
+
+  <!-- ▼ 遅刻：送り時間 -->
+  <div class="section hidden" id="sendTimeSection">
+    <label class="label">送り時間</label>
+    <select id="sendTime" class="input-select"></select>
+  </div>
+
+  <!-- ▼ 早退：お迎え時間 -->
+  <div class="section hidden" id="pickupTimeSection">
+    <label class="label">お迎え時間</label>
+    <select id="pickupTime" class="input-select"></select>
+  </div>
+
+  <!-- ▼ 理由 -->
+  <div class="section hidden" id="reasonSection">
+    <label class="label">理由</label>
+    <div id="reasonArea" class="radio-group"></div>
+  </div>
+
+  <!-- ▼ 備考 -->
+  <div class="section">
+    <label class="label">備考</label>
+    <textarea id="memo" class="textarea"></textarea>
+  </div>
+
+  <!-- ▼ 荷物（欠席のみ） -->
+  <div class="section hidden" id="baggageSection">
+    <label class="label">荷物持ち帰り</label>
+    <div class="radio-group">
+      <label><input type="radio" name="baggage" value="園"> する（園受け取り）</label>
+      <label><input type="radio" name="baggage" value="バス"> する（バス受け取り）</label>
+      <label><input type="radio" name="baggage" value="兄弟"> する（兄弟児に持たせる）</label>
+      <label><input type="radio" name="baggage" value="しない"> しない</label>
     </div>
+  </div>
 
-    <!-- STEP2：日付選択（カレンダー制御あり） -->
-    <div id="stepDate" style="display:none;">
-        <p>日程</p>
-        <input type="date" id="inputDate">
+  <!-- ▼ 給食（遅刻・早退のみ） -->
+  <div class="section hidden" id="lunchSection">
+    <label class="label">給食</label>
+    <div class="radio-group">
+      <label><input type="radio" name="lunch" value="必要"> 必要</label>
+      <label><input type="radio" name="lunch" value="不要"> 不要</label>
     </div>
+  </div>
 
-    <!-- STEP3：フォーム本体（動的制御） -->
-    <div id="stepForm" style="display:none;">
-
-        <!-- 遅刻・早退のみ -->
-        <div id="fld_time"><p>時間</p><input type="time" id="time"></div>
-
-        <!-- 理由 -->
-        <div id="fld_reason">
-            <p>理由</p>
-            <label><input type="radio" name="reason" value="私用">私用</label>
-            <label><input type="radio" name="reason" value="通院">通院</label>
-            <label><input type="radio" name="reason" value="寝坊">寝坊</label>
-            <label><input type="radio" name="reason" value="その他">その他</label>
-        </div>
-
-        <!-- バス -->
-        <div id="fld_bus">
-            <p>バス区分</p>
-            <select id="bus">
-                <option value="">選択してください</option>
-                <option value="行きのみ">行きのみ</option>
-                <option value="帰りのみ">帰りのみ</option>
-                <option value="両方">両方</option>
-            </select>
-        </div>
-
-        <!-- 給食（遅刻のみ） -->
-        <div id="fld_lunch">
-            <p>給食</p>
-            <label><input type="radio" name="lunch" value="必要">必要</label>
-            <label><input type="radio" name="lunch" value="不要">不要</label>
-        </div>
-
-        <!-- 預かり保育メニュー -->
-        <div id="fld_menu">
-            <p>メニュー</p>
-            <select id="menu"></select>
-        </div>
-
-        <!-- 備考 -->
-        <div id="fld_memo">
-            <p>備考</p>
-            <textarea id="memo"></textarea>
-        </div>
-
-        <div class="button-row">
-            <button onclick="history.back()">戻る</button>
-            <button id="btnSubmit">送信</button>
-        </div>
+  <!-- ▼ 保護者（早退・バスキャンセル） -->
+  <div class="section hidden" id="guardianSection">
+    <label class="label">保護者</label>
+    <div class="radio-group">
+      <label><input type="radio" name="guardian" value="母親"> 母親</label>
+      <label><input type="radio" name="guardian" value="父親"> 父親</label>
+      <label><input type="radio" name="guardian" value="その他"> その他</label>
     </div>
+    <input type="text" id="guardianOther" class="input-text hidden" placeholder="その他を選んだ場合入力">
+  </div>
+
+  <!-- ▼ バスキャンセル -->
+  <div class="section hidden" id="busCancelSection">
+    <label class="label">キャンセル</label>
+    <div class="checkbox-group">
+      <label><input type="checkbox" id="busMorning"> 朝バス</label>
+      <label><input type="checkbox" id="busAfternoon"> 帰りバス</label>
+    </div>
+  </div>
+
+  <!-- ▼ ボタン -->
+  <div class="btn-area">
+    <button class="btn btn-back" onclick="history.back()">戻る</button>
+    <button class="btn btn-send" id="sendBtn">送信</button>
+  </div>
+
+</div>
+
+<!-- ▼ JS 読み込み -->
+<script src="app.js"></script>
+<script src="contact_form.js"></script>
 
 </body>
 </html>
