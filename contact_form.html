@@ -2,112 +2,117 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>連絡フォーム</title>
 
-<!-- 既存のベースCSS -->
-<link rel="stylesheet" href="base.css">
+<!-- CSS（base.css を css 配下へ） -->
+<link rel="stylesheet" href="./css/base.css">
 
-<!-- contact_form専用スタイル -->
-<link rel="stylesheet" href="contact_form.css">
+<!-- LIFF SDK -->
+<script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 
+<!-- 共通 API モジュール（callApi を含む） -->
+<script src="./js/app.js"></script>
+
+<!-- 当フォーム専用 JS -->
+<script defer src="./js/contact_form.js"></script>
+
+<style>
+    /* 画面固有の微調整（base.css に影響を与えない） */
+    .form-section { 
+        margin-top: 20px;
+        padding: 15px;
+        background: #f3ecdb;
+        border-radius: 6px;
+    }
+    .row { margin: 15px 0; }
+    .row label { display: block; font-weight: bold; margin-bottom: 6px; }
+</style>
 </head>
 
 <body>
 
-<div class="container">
+<h2 id="title">連絡フォーム</h2>
 
-  <!-- タイトル（JSで「欠席連絡」「遅刻連絡」などに書き換え） -->
-  <h1 id="formTitle" class="form-title">連絡</h1>
-
-  <!-- ▼ 園児選択 -->
-  <div class="section">
-    <label class="label">園児を選んでください</label>
-    <div id="kidsArea" class="kids-area"></div>
-  </div>
-
-  <!-- ▼ 日付 -->
-  <div class="section">
-    <label class="label">日程</label>
-    <input type="text" id="dateInput" class="input-text" readonly>
-  </div>
-
-  <!-- ▼ 遅刻：送り時間 -->
-  <div class="section hidden" id="sendTimeSection">
-    <label class="label">送り時間</label>
-    <select id="sendTime" class="input-select"></select>
-  </div>
-
-  <!-- ▼ 早退：お迎え時間 -->
-  <div class="section hidden" id="pickupTimeSection">
-    <label class="label">お迎え時間</label>
-    <select id="pickupTime" class="input-select"></select>
-  </div>
-
-  <!-- ▼ 理由 -->
-  <div class="section hidden" id="reasonSection">
-    <label class="label">理由</label>
-    <div id="reasonArea" class="radio-group"></div>
-  </div>
-
-  <!-- ▼ 備考 -->
-  <div class="section">
-    <label class="label">備考</label>
-    <textarea id="memo" class="textarea"></textarea>
-  </div>
-
-  <!-- ▼ 荷物（欠席のみ） -->
-  <div class="section hidden" id="baggageSection">
-    <label class="label">荷物持ち帰り</label>
-    <div class="radio-group">
-      <label><input type="radio" name="baggage" value="園"> する（園受け取り）</label>
-      <label><input type="radio" name="baggage" value="バス"> する（バス受け取り）</label>
-      <label><input type="radio" name="baggage" value="兄弟"> する（兄弟児に持たせる）</label>
-      <label><input type="radio" name="baggage" value="しない"> しない</label>
+<!-- ① 園児選択 -->
+<div class="form-section">
+    <div class="row">
+        <label>園児を選んでください</label>
+        <div id="kidArea"></div>
     </div>
-  </div>
 
-  <!-- ▼ 給食（遅刻・早退のみ） -->
-  <div class="section hidden" id="lunchSection">
-    <label class="label">給食</label>
-    <div class="radio-group">
-      <label><input type="radio" name="lunch" value="必要"> 必要</label>
-      <label><input type="radio" name="lunch" value="不要"> 不要</label>
+    <!-- ② 日付選択（園児選択後に活性化） -->
+    <div class="row">
+        <label>日程</label>
+        <input id="date" type="date" disabled>
     </div>
-  </div>
-
-  <!-- ▼ 保護者（早退・バスキャンセル） -->
-  <div class="section hidden" id="guardianSection">
-    <label class="label">保護者</label>
-    <div class="radio-group">
-      <label><input type="radio" name="guardian" value="母親"> 母親</label>
-      <label><input type="radio" name="guardian" value="父親"> 父親</label>
-      <label><input type="radio" name="guardian" value="その他"> その他</label>
-    </div>
-    <input type="text" id="guardianOther" class="input-text hidden" placeholder="その他を選んだ場合入力">
-  </div>
-
-  <!-- ▼ バスキャンセル -->
-  <div class="section hidden" id="busCancelSection">
-    <label class="label">キャンセル</label>
-    <div class="checkbox-group">
-      <label><input type="checkbox" id="busMorning"> 朝バス</label>
-      <label><input type="checkbox" id="busAfternoon"> 帰りバス</label>
-    </div>
-  </div>
-
-  <!-- ▼ ボタン -->
-  <div class="btn-area">
-    <button class="btn btn-back" onclick="history.back()">戻る</button>
-    <button class="btn btn-send" id="sendBtn">送信</button>
-  </div>
-
 </div>
 
-<!-- ▼ JS 読み込み -->
-<script src="app.js"></script>
-<script src="contact_form.js"></script>
+<!-- ③ 本体フォーム（最初は非表示） -->
+<div id="formBody" class="form-section" style="display:none;">
+
+    <!-- 欠席：荷物 -->
+    <div class="row" id="row-baggage">
+        <label>荷物持ち帰り</label>
+        <label><input type="radio" name="baggage" value="園受け取り">園受け取り</label>
+        <label><input type="radio" name="baggage" value="バス受け取り">バス受け取り</label>
+        <label><input type="radio" name="baggage" value="兄弟児に持たせる">兄弟児に持たせる</label>
+        <label><input type="radio" name="baggage" value="しない">しない</label>
+    </div>
+
+    <!-- 遅刻：送り時間 -->
+    <div class="row" id="row-send">
+        <label>送り時間</label>
+        <select id="send"></select>
+    </div>
+
+    <!-- 早退：お迎え時間 -->
+    <div class="row" id="row-pickup">
+        <label>お迎え時間</label>
+        <select id="pickup"></select>
+    </div>
+
+    <!-- 共通：理由 -->
+    <div class="row" id="row-reason">
+        <label>理由</label>
+        <div id="reasonArea"></div>
+    </div>
+
+    <!-- 備考 -->
+    <div class="row" id="row-memo">
+        <label>備考</label>
+        <input id="memo" type="text">
+    </div>
+
+    <!-- 給食（必要日だけ表示） -->
+    <div class="row" id="row-lunch">
+        <label>給食</label>
+        <label><input type="radio" name="lunch" value="必要">必要</label>
+        <label><input type="radio" name="lunch" value="不要">不要</label>
+    </div>
+
+    <!-- 早退 & バスキャンセル：保護者 -->
+    <div class="row" id="row-guardian">
+        <label>来園する保護者</label>
+        <label><input type="radio" name="guardian" value="母親">母親</label>
+        <label><input type="radio" name="guardian" value="父親">父親</label>
+        <label><input type="radio" name="guardian" value="その他">その他</label>
+        <input id="guardianOther" type="text" placeholder="その他の場合入力">
+    </div>
+
+    <!-- バスキャンセル：朝/帰 -->
+    <div class="row" id="row-bus">
+        <label>キャンセルバス</label>
+        <label><input type="checkbox" id="bus_morning">朝バス</label>
+        <label><input type="checkbox" id="bus_evening">帰りバス</label>
+    </div>
+
+    <!-- ボタン -->
+    <div class="row" style="text-align:center;">
+        <button id="btnBack" class="menu-btn" style="background:white;color:#c93056;border:2px solid #c93056;width:120px;">戻る</button>
+        <button id="btnSubmit" class="menu-btn" style="width:120px;">送信</button>
+    </div>
+
+</div>
 
 </body>
 </html>
