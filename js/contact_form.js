@@ -20,6 +20,11 @@ document.addEventListener("DOMContentLoaded", initPage);
 
 async function initPage() {
     try {
+
+        if (typeof restoreAuthCode === "function") {
+            restoreAuthCode();
+        }
+        
         // 1) URL パラメータ
         const params = new URLSearchParams(location.search);
         contactType = params.get("type");
