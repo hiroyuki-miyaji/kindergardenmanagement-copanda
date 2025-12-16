@@ -73,7 +73,8 @@ async function onKidSelected() {
 
   calendarData = await apiGetCalendar({
     contactType,
-    className: selectedKid.class
+    className: selectedKid.class,
+    lunchAvailable: selectedKid.lunchAvailable      
   });
 
   if (!calendarData?.calendar?.length) {
