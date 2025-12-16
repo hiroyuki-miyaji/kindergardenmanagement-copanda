@@ -131,6 +131,12 @@ h1, h2, h3 {
     display: none !important;
 }
 
+.row .inline-label {
+  display: inline-flex;
+  align-items: center;
+  margin-right: 16px;
+  font-size: 16px;
+}
 
 /* ================================
    メニュー UI（既存）
