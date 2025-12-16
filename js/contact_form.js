@@ -261,6 +261,61 @@ async function onSubmitContact() {
   }
 }
 
+function buildSubmitPayload() {
+  const payload = {
+    action: "submit_contact",
+    authCode: AUTH_CODE,
+    contactType,
+    date: selectedDate,
+    kid: selectedKid.kidsid,
+    reason: document.querySelector("input[name=reason]:checked")?.value || null,
+    memo: document.getElementById("memo")?.value || null
+  };
+
+  // ===== 連絡区分別 =====
+  if (contactType === "欠席") {
+    payload.baggage =
+      document.querySelector("input[name=baggage]:checked")?.value || null;
+
+    payload.lunch =
+      document.querySelector("input[name=lunch]:checked")?.value || null;
+  }
+
+  if (contactType === "遅刻") {
+    payload.sendTime = document.getElementById("send")?.value || null;
+    payload.lunch =
+      document.querySelector("input[name=lunch]:checked")?.value || null;
+  }
+
+  if (contactType === "早退") {
+    payload.pickupTime = document.getElementById("pickup")?.value || null;
+
+    payload.guardian =
+      document.querySelector("input[name=guardian]:checked")?.value || null;
+
+    payload.guardianOther =
+      document.getElementById("guardianOther")?.value || null;
+
+    payload.lunch =
+      document.querySelector("input[name=lunch]:checked")?.value || null;
+  }
+
+  if (contactType === "バスキャンセル") {
+    payload.bus = {
+      morning: document.getElementById("bus_morning")?.checked || false,
+      evening: document.getElementById("bus_evening")?.checked || false
+    };
+
+    payload.guardian =
+      document.querySelector("input[name=guardian]:checked")?.value || null;
+
+    payload.guardianOther =
+      document.getElementById("guardianOther")?.value || null;
+  }
+
+  return payload;
+}
+
 /****************************************************
  * 補助（未変更）
  ****************************************************/
