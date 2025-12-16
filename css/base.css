@@ -150,19 +150,7 @@ select {
   color: white;
   font-weight: bold;
 }
-.date-box {
-  padding: 12px;
-  border: 1px solid #c93056;
-  border-radius: 6px;
-  background: #fff;
-  font-size: 16px;
-}
 
-.date-box::after {
-  content: " ▼";
-  float: right;
-  color: #c93056;
-}
 /* ================================
    スマホ対応
 ================================ */
