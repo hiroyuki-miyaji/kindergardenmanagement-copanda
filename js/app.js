@@ -236,8 +236,7 @@ async function apiGetKids() {
 async function apiGetCalendar(contactType, className) {
     return await callApi({
         action: "get_calendar",
-        contactType: contactType,
-        className: className
+        ...params
     });
 }
 
