@@ -5,8 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>連絡フォーム</title>
 
-<!-- Base CSS -->
+<!-- 共通CSS（メニュー・全体） -->
 <link rel="stylesheet" href="./css/base.css">
+
+<!-- ★ フォーム専用CSS（新規） -->
+<link rel="stylesheet" href="./css/contact_form.css">
 
 <!-- LIFF SDK -->
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
@@ -16,40 +19,6 @@
 
 <!-- 当フォーム専用 -->
 <script defer src="./js/contact_form.js"></script>
-
-<style>
-/* 画面固有の最小限調整（既存踏襲） */
-.form-section {
-  margin-top: 20px;
-  padding: 15px;
-  background: #f3ecdb;
-  border-radius: 6px;
-}
-
-.row {
-  margin: 18px 0;
-}
-
-/* 見出しラベル */
-.row > label {
-  display: block;
-  font-weight: bold;
-  margin-bottom: 8px;
-}
-
-/* 選択肢ラベル（横並び） */
-.row .inline-label {
-  display: inline-flex;
-  align-items: center;
-  margin-right: 18px;
-  font-weight: normal;
-}
-
-#guardianOther {
-  margin-top: 6px;
-  width: 90%;
-}
-</style>
 </head>
 
 <body>
@@ -61,30 +30,38 @@
   <div class="form-section">
     <div class="row">
       <label>園児を選んでください</label>
-      <!-- ★ class 追加（重要） -->
       <div id="kidArea" class="kids-area"></div>
     </div>
 
-    <!-- ② 日付選択 -->
-<div class="row hidden" id="calendarArea">
-  <label>日程</label>
+    <!-- ② 日付選択（折り畳み） -->
+    <div class="row hidden" id="calendarArea">
+      <label>日程</label>
 
-  <!-- 表示用 -->
-  <div id="selectedDateBox" class="date-box">
-    日付を選択してください
-  </div>
+      <!-- 選択済み日付表示（トグル） -->
+      <button
+        type="button"
+        id="selectedDateBox"
+        class="date-box"
+        aria-expanded="false"
+      >
+        日付を選択してください ▼
+      </button>
 
-  <!-- 折りたたみカレンダー -->
-    <div id="calendarWrap" class="hidden">
-      <div class="calendar-header">
-        <button type="button" id="prevMonth">‹</button>
-        <span id="calendarTitle"></span>
-        <button type="button" id="nextMonth">›</button>
+      <!-- 折り畳みカレンダー -->
+      <div
+        id="calendarWrap"
+        class="calendar-wrap"
+        aria-hidden="true"
+      >
+        <div class="calendar-header">
+          <button type="button" id="prevMonth" aria-label="前の月">‹</button>
+          <span id="calendarTitle"></span>
+          <button type="button" id="nextMonth" aria-label="次の月">›</button>
+        </div>
+
+        <div id="calendarGrid" class="calendar-grid"></div>
       </div>
-      <div id="calendarGrid" class="calendar-grid"></div>
     </div>
-  
-  </div>
   </div>
 
   <!-- ③ フォーム本体 -->
@@ -138,12 +115,19 @@
       <label class="inline-label"><input type="checkbox">帰りバス</label>
     </div>
 
-    <div class="row" style="text-align:center;">
-      <button id="btnBack" class="menu-btn"
-        style="background:white;color:#c93056;border:2px solid #c93056;width:120px;">
+    <div class="row btn-row">
+      <button
+        id="btnBack"
+        class="menu-btn btn-back"
+        type="button"
+      >
         戻る
       </button>
-      <button id="btnSubmit" class="menu-btn" style="width:120px;">
+      <button
+        id="btnSubmit"
+        class="menu-btn"
+        type="button"
+      >
         送信
       </button>
     </div>
