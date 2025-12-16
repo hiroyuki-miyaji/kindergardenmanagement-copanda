@@ -88,63 +88,53 @@ async function onKidSelected() {
 /****************************************************
  * カレンダー Grid（月めくり対応）
  ****************************************************/
-let currentYearMonth = null; // "2025-12"
+let currentYearMonth = null; // "YYYY-MM"
 
 function renderCalendarGrid({ calendar, lunchDates }) {
-
   const area = document.getElementById("calendarArea");
   const grid = document.getElementById("calendarGrid");
-
   area.classList.remove("hidden");
 
-  // yyyy-mm 単位で整理
+  // yyyy-mm でグルーピング
   const byMonth = {};
   calendar.forEach(d => {
     const ym = d.slice(0, 7);
-    if (!byMonth[ym]) byMonth[ym] = [];
-    byMonth[ym].push(d);
+    (byMonth[ym] ||= []).push(d);
   });
 
   const months = Object.keys(byMonth).sort();
   if (!currentYearMonth) currentYearMonth = months[0];
 
-  drawMonth();
+  draw();
 
-  function drawMonth() {
+  function draw() {
     grid.innerHTML = "";
 
-    // ===== ヘッダー（月切替） =====
+    // ---- 月切替ヘッダ ----
     const header = document.createElement("div");
     header.className = "calendar-header";
     header.innerHTML = `
-      <button id="prevMonth">‹</button>
+      <button type="button" id="prevMonth">‹</button>
       <span>${currentYearMonth.replace("-", "年")}月</span>
-      <button id="nextMonth">›</button>
+      <button type="button" id="nextMonth">›</button>
     `;
     grid.appendChild(header);
 
     document.getElementById("prevMonth").onclick = () => {
-      const idx = months.indexOf(currentYearMonth);
-      if (idx > 0) {
-        currentYearMonth = months[idx - 1];
-        drawMonth();
-      }
+      const i = months.indexOf(currentYearMonth);
+      if (i > 0) { currentYearMonth = months[i - 1]; draw(); }
     };
     document.getElementById("nextMonth").onclick = () => {
-      const idx = months.indexOf(currentYearMonth);
-      if (idx < months.length - 1) {
-        currentYearMonth = months[idx + 1];
-        drawMonth();
-      }
+      const i = months.indexOf(currentYearMonth);
+      if (i < months.length - 1) { currentYearMonth = months[i + 1]; draw(); }
     };
 
-    // ===== 曜日 =====
-    const week = ["日","月","火","水","木","金","土"];
-    week.forEach(w => {
-      grid.insertAdjacentHTML("beforeend", `<div class="cal-head">${w}</div>`);
-    });
+    // ---- 曜日 ----
+    ["日","月","火","水","木","金","土"].forEach(w =>
+      grid.insertAdjacentHTML("beforeend", `<div class="cal-head">${w}</div>`)
+    );
 
-    // ===== 日付 =====
+    // ---- 日付 ----
     const dates = byMonth[currentYearMonth];
     const first = new Date(dates[0]);
     for (let i = 0; i < first.getDay(); i++) {
@@ -163,10 +153,8 @@ function renderCalendarGrid({ calendar, lunchDates }) {
       }
 
       cell.onclick = () => {
-        document.querySelectorAll(".cal-day")
-          .forEach(c => c.classList.remove("selected"));
+        document.querySelectorAll(".cal-day").forEach(c => c.classList.remove("selected"));
         cell.classList.add("selected");
-
         selectedDate = dateStr;
         document.getElementById("formBody").style.display = "block";
         updateFormByType();
@@ -176,6 +164,7 @@ function renderCalendarGrid({ calendar, lunchDates }) {
     });
   }
 }
+
 /****************************************************
  * 連絡区分別 UI 制御
  ****************************************************/
