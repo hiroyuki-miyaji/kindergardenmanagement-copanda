@@ -1,0 +1,134 @@
+/* ================================
+   連絡フォーム専用
+================================ */
+
+.container {
+  max-width: 760px;
+  margin: 0 auto;
+  background: white;
+  padding: 20px 18px 40px;
+  border-radius: 8px;
+}
+
+.form-section {
+  margin-top: 20px;
+  padding: 15px;
+  background: #f3ecdb;
+  border-radius: 6px;
+}
+
+.row {
+  margin: 15px 0;
+}
+
+.row > label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 6px;
+}
+
+/* 横並びラジオ */
+.inline-label {
+  display: inline-flex;
+  align-items: center;
+  margin-right: 16px;
+  font-size: 16px;
+}
+
+/* ================================
+   カレンダー折り畳み
+================================ */
+
+.calendar-toggle {
+  width: 100%;
+  padding: 12px;
+  border-radius: 6px;
+  border: 2px solid #c93056;
+  background: #fff;
+  color: #c93056;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.calendar-toggle:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* ================================
+   カレンダー
+================================ */
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  text-align: center;
+  margin-top: 12px;
+}
+
+.calendar-header {
+  grid-column: span 7;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.calendar-header button {
+  background: #fff;
+  border: 1px solid #c93056;
+  color: #c93056;
+  border-radius: 6px;
+  width: 40px;
+  height: 40px;
+  font-size: 18px;
+}
+
+.calendar-header span {
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.cal-head {
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.cal-day {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  font-size: 15px;
+}
+
+.cal-day.selectable {
+  border: 1px solid #c93056;
+  background: #fff;
+  cursor: pointer;
+}
+
+.cal-day.lunch {
+  background: #fff3b0;
+}
+
+.cal-day.selected {
+  background: #c93056;
+  color: white;
+  font-weight: bold;
+}
+
+/* ================================
+   スマホ最適化
+================================ */
+@media screen and (max-width: 767px) {
+  .calendar-grid {
+    gap: 4px;
+  }
+
+  .cal-day {
+    font-size: 16px;
+  }
+}
