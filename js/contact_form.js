@@ -1,258 +1,240 @@
-/********************************************************************
- * contact_form.js  （登降園連絡フォーム）
- * - contactType は URL パラメータで確定
- * - getKids → kids データ保持
- * - getCalendar(contactType, class, lunchAvailable)
- * - calendar & lunchDates に基づき UI 制御
- ********************************************************************/
+/****************************************************
+ * contact_form.js（app.js 構造に完全準拠した最終版）
+ ****************************************************/
 
-// ------------------------
-// API CALL 共通
-// ------------------------
-async function callApi(payload) {
-    console.log("▶ API Request:", payload);
+let selectedKid = null;
+let selectedDate = null;
+let calendarData = null;       // { calendar:[], lunchDates:[] }
 
-    const res = await fetch("/api/logicapps", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-    });
-
-    return await res.json();
-}
-
-// ------------------------
-// DOM エレメント取得
-// ------------------------
-const kidSelect = document.getElementById("kidSelect");
-const dateSelect = document.getElementById("dateSelect");
-
-const formFields = document.getElementById("formFields");
-
-// 欠席
-const reasonField_absent = document.getElementById("reason_absent");
-const baggageField = document.getElementById("baggageField");
-
-// 遅刻
-const sendTimeField = document.getElementById("sendTimeField");
-const reasonField_late = document.getElementById("reason_late");
-
-// 早退
-const pickupTimeField = document.getElementById("pickupTimeField");
-const reasonField_early = document.getElementById("reason_early");
-const guardianField = document.getElementById("guardianField");
-
-// バスキャンセル
-const busCancelField = document.getElementById("busCancelField");
-const guardianField_bus = document.getElementById("guardianField_bus");
-
-// 給食選択
-const lunchField = document.getElementById("lunchField");
-
-// 備考
-const memoField = document.getElementById("memoField");
-
-// 送信ボタン
-const submitBtn = document.getElementById("submitBtn");
-
-// URL パラメータから contactType を取得
-const urlParams = new URLSearchParams(window.location.search);
-const contactType = urlParams.get("type");
-
-let kidsData = [];          // getKids の結果を保持
-let selectedKid = null;     // 選択された園児
-let calendarDates = [];     // 保育日
-let lunchDates = [];        // 給食あり日
+// URL パラメータで連絡種別を確定
+const url = new URL(location.href);
+const contactType = url.searchParams.get("type");    // 欠席 / 遅刻 / 早退 / バスキャンセル
 
 
-/********************************************************************
- * INIT：園児一覧のロード
- ********************************************************************/
-window.addEventListener("DOMContentLoaded", async () => {
+/****************************************************
+ * 初期化
+ ****************************************************/
+document.addEventListener("DOMContentLoaded", async () => {
+
+    // app.js が restoreAuthCode を呼び、AUTH_CODE を復元済みの前提
+    if (!AUTH_CODE) {
+        alert("認証情報がありません。LINEから再度アクセスしてください。");
+        return;
+    }
+
+    document.getElementById("title").textContent = `連絡フォーム（${contactType}）`;
+
     await loadKids();
+    hideAllRows();
+
+    document.getElementById("btnBack").onclick = () => history.back();
+    document.getElementById("btnSubmit").onclick = submitContact;
 });
 
-/********************************************************************
- * 園児一覧の取得 getKids
- ********************************************************************/
+
+/****************************************************
+ * 1. 園児一覧を取得（app.js の apiGetKids を利用）
+ ****************************************************/
 async function loadKids() {
-    const res = await callApi({
-        action: "getKids"
-    });
 
-    if (!res.kids || res.kids.length === 0) {
-        kidSelect.innerHTML = "<option value=''>園児が登録されていません</option>";
+    const res = await apiGetKids();
+
+    if (!res || !res.value) {
+        alert("園児情報の取得に失敗しました");
         return;
     }
 
-    kidsData = res.kids;
+    const kids = res.value;
+    const kidArea = document.getElementById("kidArea");
+    kidArea.innerHTML = "";
 
-    kidSelect.innerHTML = "<option value=''>選択してください</option>";
-    res.kids.forEach(k => {
-        const op = document.createElement("option");
-        op.value = k.kidsid;
-        op.textContent = k.name + "（" + k.class + "）";
-        kidSelect.appendChild(op);
+    kids.forEach(kid => {
+        const div = document.createElement("div");
+        div.innerHTML = `
+            <label>
+                <input type="radio" name="kid" value="${kid.kidsid}">
+                ${kid.name}（${kid.class}）
+            </label>
+        `;
+        kidArea.appendChild(div);
+    });
+
+    // 選択後カレンダー取得
+    kidArea.addEventListener("change", () => {
+        const kidId = document.querySelector('input[name="kid"]:checked').value;
+        selectedKid = kids.find(k => k.kidsid === kidId);
+
+        selectedDate = null;
+        document.getElementById("date").value = "";
+
+        hideAllRows();
+        loadCalendar();
     });
 }
 
-/********************************************************************
- * 園児が選択されたら → 日付選択をクリア & カレンダーを取得
- ********************************************************************/
-kidSelect.addEventListener("change", async () => {
-    const kidId = kidSelect.value;
-    selectedKid = kidsData.find(k => k.kidsid === kidId);
 
-    dateSelect.innerHTML = "<option value=''>日付選択...</option>";
-    formFields.style.display = "none";
-
-    if (selectedKid) {
-        await loadCalendar();
-    }
-});
-
-/********************************************************************
- * getCalendar(contactType, class, lunchAvailable)
- ********************************************************************/
+/****************************************************
+ * 2. カレンダー取得（app.js の apiGetCalendar を利用）
+ ****************************************************/
 async function loadCalendar() {
-    const res = await callApi({
-        action: "getCalendar",
-        contactType: contactType,
-        class: selectedKid.class,
-        lunchAvailable: selectedKid.lunchAvailable
-    });
 
-    console.log("▶ calendar res:", res);
+    const res = await apiGetCalendar(contactType, selectedKid.class);
 
-    calendarDates = res.calendar || [];
-    lunchDates = res.lunchDates || [];
-
-    // 日付プルダウン生成
-    dateSelect.innerHTML = "<option value=''>選択してください</option>";
-    calendarDates.forEach(d => {
-        const op = document.createElement("option");
-        op.value = d;
-        op.textContent = d;
-        dateSelect.appendChild(op);
-    });
-}
-
-/********************************************************************
- * 日付を選択 → フォーム全体を表示 & 給食UI制御
- ********************************************************************/
-dateSelect.addEventListener("change", () => {
-    if (!dateSelect.value) {
-        formFields.style.display = "none";
+    if (!res || res.result !== "success") {
+        alert("カレンダーの取得に失敗しました");
         return;
     }
 
-    formFields.style.display = "block";
-    updateFormByType(contactType);
-});
+    calendarData = res;
 
-/********************************************************************
- * 種別ごとのフォーム表示制御
- ********************************************************************/
-function updateFormByType(type) {
+    const dateInput = document.getElementById("date");
+    dateInput.disabled = false;
 
-    // 全て非表示
-    reasonField_absent.style.display = "none";
-    baggageField.style.display = "none";
+    dateInput.onchange = () => {
+        selectedDate = dateInput.value;
+        updateFormVisibility();
+    };
+}
 
-    reasonField_late.style.display = "none";
-    sendTimeField.style.display = "none";
 
-    reasonField_early.style.display = "none";
-    pickupTimeField.style.display = "none";
-    guardianField.style.display = "none";
+/****************************************************
+ * 3. 日付選択後にフォーム本体を表示
+ ****************************************************/
+function updateFormVisibility() {
 
-    busCancelField.style.display = "none";
-    guardianField_bus.style.display = "none";
+    if (!selectedKid || !selectedDate) return;
 
-    lunchField.style.display = "none";
-    memoField.style.display = "block"; // 備考は常に表示
+    document.getElementById("formBody").style.display = "block";
 
-    // 日付に給食があるか
-    const isLunchDay = lunchDates.includes(dateSelect.value);
+    hideAllRows();
 
-    // ----------------------------
-    // 欠席
-    // ----------------------------
-    if (type === "欠席") {
-        reasonField_absent.style.display = "block";
-        baggageField.style.display = "block";
-        lunchField.style.display = "none"; // 欠席は給食不要で固定
-    }
+    // 連絡種別ごとの行表示
+    switch (contactType) {
 
-    // ----------------------------
-    // 遅刻
-    // ----------------------------
-    if (type === "遅刻") {
-        reasonField_late.style.display = "block";
-        sendTimeField.style.display = "block";
+        case "欠席":
+            showRow("row-baggage");
+            showRow("row-reason");
+            showRow("row-memo");
+            // 給食不要を自動セット
+            document.querySelector('input[name="lunch"][value="不要"]').checked = true;
+            showRow("row-lunch");
+            break;
 
-        if (isLunchDay) lunchField.style.display = "block";
-    }
+        case "遅刻":
+            showRow("row-send");
+            showRow("row-reason");
+            showRow("row-memo");
+            setupTime("send", 9, 30, 12, 0);
+            handleLunchVisibility();
+            break;
 
-    // ----------------------------
-    // 早退
-    // ----------------------------
-    if (type === "早退") {
-        reasonField_early.style.display = "block";
-        pickupTimeField.style.display = "block";
-        guardianField.style.display = "block";
+        case "早退":
+            showRow("row-pickup");
+            showRow("row-reason");
+            showRow("row-memo");
+            showRow("row-guardian");
+            setupTime("pickup", 10, 0, 13, 30);
+            handleLunchVisibility();
+            break;
 
-        if (isLunchDay) lunchField.style.display = "block";
-    }
-
-    // ----------------------------
-    // バスキャンセル
-    // ----------------------------
-    if (type === "バスキャンセル") {
-        busCancelField.style.display = "block";
-        guardianField_bus.style.display = "block";
-        lunchField.style.display = "none";
+        case "バスキャンセル":
+            showRow("row-bus");
+            showRow("row-guardian");
+            // 給食は不要
+            break;
     }
 }
 
-/********************************************************************
- * 送信 submit_contact
- ********************************************************************/
-submitBtn.addEventListener("click", async () => {
-    if (!selectedKid || !dateSelect.value) {
-        alert("園児・日付を選択してください");
-        return;
+
+/****************************************************
+ * 4. 行の表示管理
+ ****************************************************/
+function hideAllRows() {
+    document.querySelectorAll("#formBody .row").forEach(r => r.style.display = "none");
+}
+
+function showRow(id) {
+    document.getElementById(id).style.display = "block";
+}
+
+
+/****************************************************
+ * 5. 時刻セレクトを生成
+ ****************************************************/
+function setupTime(selectId, startH, startM, endH, endM) {
+
+    const sel = document.getElementById(selectId);
+    sel.innerHTML = "";
+
+    let time = new Date(2000, 0, 1, startH, startM);
+    const end = new Date(2000, 0, 1, endH, endM);
+
+    while (time <= end) {
+        const hh = String(time.getHours()).padStart(2, "0");
+        const mm = String(time.getMinutes()).padStart(2, "0");
+        const opt = document.createElement("option");
+        opt.value = `${hh}:${mm}`;
+        opt.textContent = `${hh}:${mm}`;
+        sel.appendChild(opt);
+        time.setMinutes(time.getMinutes() + 30);
     }
+}
+
+
+/****************************************************
+ * 6. 給食の表示制御
+ ****************************************************/
+function handleLunchVisibility() {
+    const isLunchDay = calendarData.lunchDates.includes(selectedDate);
+    const row = document.getElementById("row-lunch");
+    row.style.display = isLunchDay ? "block" : "none";
+}
+
+
+/****************************************************
+ * 7. submit_contact（app.js の apiSubmitContact を利用）
+ ****************************************************/
+async function submitContact() {
 
     const payload = {
-        action: "submit_contact",
-        contactType: contactType,
         kidsid: selectedKid.kidsid,
-        date: dateSelect.value,
-
-        reason: document.querySelector("input[name='reason']:checked")?.value || "",
-        memo: document.getElementById("memo")?.value || "",
-
-        lunch: document.querySelector("input[name='lunch']:checked")?.value || "",
-
-        send: document.getElementById("sendTime")?.value || "",
-        pickup: document.getElementById("pickupTime")?.value || "",
-
-        guardian: document.querySelector("input[name='guardian']:checked")?.value || "",
-        other: document.getElementById("guardian_other")?.value || "",
-
-        baggage: document.querySelector("input[name='baggage']:checked")?.value || "",
-        bus: document.querySelector("input[name='busCancel']:checked")?.value || ""
+        contactType,
+        date: selectedDate,
+        reason: getRadioValue("reason"),
+        memo: document.getElementById("memo").value,
+        baggage: getRadioValue("baggage"),
+        lunch: getRadioValue("lunch"),
+        send: document.getElementById("send")?.value,
+        pickup: document.getElementById("pickup")?.value,
+        guardian: getRadioValue("guardian"),
+        other: document.getElementById("guardianOther").value,
+        bus: getBusCancel()
     };
 
-    console.log("▶ submit payload:", payload);
+    console.log("Submit Payload:", payload);
 
-    const res = await callApi(payload);
+    const res = await apiSubmitContact(payload);
 
     if (res.result === "success") {
         alert("送信しました");
-        location.href = "/mypage";
+        location.href = "index.html";
     } else {
         alert("送信に失敗しました");
     }
-});
+}
+
+
+/****************************************************
+ * Utility
+ ****************************************************/
+function getRadioValue(name) {
+    const el = document.querySelector(`input[name="${name}"]:checked`);
+    return el ? el.value : "";
+}
+
+function getBusCancel() {
+    let arr = [];
+    if (document.getElementById("bus_morning").checked) arr.push("朝バス");
+    if (document.getElementById("bus_evening").checked) arr.push("帰りバス");
+    return arr;
+}
