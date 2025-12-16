@@ -3,6 +3,7 @@ let selectedKid = null;
 let selectedDate = null;
 let calendarData = null;
 let contactType = null;
+let currentYearMonth = null;
 
 /****************************************************
  * 初期化
