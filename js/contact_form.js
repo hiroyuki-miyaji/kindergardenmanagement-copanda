@@ -86,56 +86,96 @@ async function onKidSelected() {
 }
 
 /****************************************************
- * カレンダー Grid 描画
+ * カレンダー Grid（月めくり対応）
  ****************************************************/
+let currentYearMonth = null; // "2025-12"
+
 function renderCalendarGrid({ calendar, lunchDates }) {
 
+  const area = document.getElementById("calendarArea");
   const grid = document.getElementById("calendarGrid");
-  grid.innerHTML = "";
 
-  const week = ["日","月","火","水","木","金","土"];
-  week.forEach(w => {
-    grid.insertAdjacentHTML("beforeend",
-      `<div class="cal-head">${w}</div>`
-    );
+  area.classList.remove("hidden");
+
+  // yyyy-mm 単位で整理
+  const byMonth = {};
+  calendar.forEach(d => {
+    const ym = d.slice(0, 7);
+    if (!byMonth[ym]) byMonth[ym] = [];
+    byMonth[ym].push(d);
   });
 
-  // 月初のズレ
-  const firstDate = new Date(calendar[0]);
-  for (let i = 0; i < firstDate.getDay(); i++) {
-    grid.insertAdjacentHTML("beforeend", `<div></div>`);
-  }
+  const months = Object.keys(byMonth).sort();
+  if (!currentYearMonth) currentYearMonth = months[0];
 
-  calendar.forEach(dateStr => {
-    const d = new Date(dateStr);
-    const day = d.getDate();
+  drawMonth();
 
-    const cell = document.createElement("div");
-    cell.className = "cal-day selectable";
-    cell.textContent = day;
+  function drawMonth() {
+    grid.innerHTML = "";
 
-    if (lunchDates.includes(dateStr)) {
-      cell.classList.add("lunch");
-      cell.title = "給食あり";
-    }
+    // ===== ヘッダー（月切替） =====
+    const header = document.createElement("div");
+    header.className = "calendar-header";
+    header.innerHTML = `
+      <button id="prevMonth">‹</button>
+      <span>${currentYearMonth.replace("-", "年")}月</span>
+      <button id="nextMonth">›</button>
+    `;
+    grid.appendChild(header);
 
-    cell.onclick = () => {
-      document.querySelectorAll(".cal-day")
-        .forEach(c => c.classList.remove("selected"));
-
-      cell.classList.add("selected");
-      selectedDate = dateStr;
-
-      document.getElementById("formBody").style.display = "block";
-      updateFormByType();
+    document.getElementById("prevMonth").onclick = () => {
+      const idx = months.indexOf(currentYearMonth);
+      if (idx > 0) {
+        currentYearMonth = months[idx - 1];
+        drawMonth();
+      }
+    };
+    document.getElementById("nextMonth").onclick = () => {
+      const idx = months.indexOf(currentYearMonth);
+      if (idx < months.length - 1) {
+        currentYearMonth = months[idx + 1];
+        drawMonth();
+      }
     };
 
-    grid.appendChild(cell);
-  });
+    // ===== 曜日 =====
+    const week = ["日","月","火","水","木","金","土"];
+    week.forEach(w => {
+      grid.insertAdjacentHTML("beforeend", `<div class="cal-head">${w}</div>`);
+    });
 
-  document.getElementById("calendarArea").classList.remove("hidden");
+    // ===== 日付 =====
+    const dates = byMonth[currentYearMonth];
+    const first = new Date(dates[0]);
+    for (let i = 0; i < first.getDay(); i++) {
+      grid.insertAdjacentHTML("beforeend", `<div></div>`);
+    }
+
+    dates.forEach(dateStr => {
+      const d = new Date(dateStr);
+      const cell = document.createElement("div");
+      cell.className = "cal-day selectable";
+      cell.textContent = d.getDate();
+
+      if ((lunchDates ?? []).includes(dateStr)) {
+        cell.classList.add("lunch");
+        cell.title = "給食あり";
+      }
+
+      cell.onclick = () => {
+        document.querySelectorAll(".cal-day")
+          .forEach(c => c.classList.remove("selected"));
+        cell.classList.add("selected");
+
+        selectedDate = dateStr;
+        document.getElementById("formBody").style.display = "block";
+        updateFormByType();
+      };
+
+      grid.appendChild(cell);
+    });
+  }
 }
-
 /****************************************************
  * 連絡区分別 UI 制御
  ****************************************************/
