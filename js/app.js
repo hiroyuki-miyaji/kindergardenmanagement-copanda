@@ -233,7 +233,7 @@ async function apiGetKids() {
     });
 }
 
-async function apiGetCalendar(contactType, className) {
+async function apiGetCalendar(params) {
     return await callApi({
         action: "get_calendar",
         ...params
