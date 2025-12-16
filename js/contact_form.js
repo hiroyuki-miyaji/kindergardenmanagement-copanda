@@ -10,23 +10,35 @@ let contactType = null;
 document.addEventListener("DOMContentLoaded", initPage);
 
 async function initPage() {
-  const params = new URLSearchParams(location.search);
-  contactType = params.get("type");
+    try {
 
-  if (!contactType) {
-    alert("連絡区分が指定されていません");
-    return;
-  }
+        if (typeof restoreAuthCode === "function") {
+            restoreAuthCode();
+        }
+        await Promise.resolve();
 
-  restoreAuthCode();
-  if (!AUTH_CODE) {
-    alert("認証情報がありません。LINEから再度アクセスしてください。");
-    location.href = "index.html";
-    return;
-  }
+        // 1) URL パラメータ
+        const params = new URLSearchParams(location.search);
+        contactType = params.get("type");
+        if (!contactType) {
+            alert("連絡区分が指定されていません。");
+            return;
+        }
 
-  document.getElementById("title").textContent = `${contactType}連絡`;
-  await loadKids();
+        // 2) 認証確認（LIFF には触らない）
+        if (!AUTH_CODE) {
+            alert("認証情報がありません。LINEから再度アクセスしてください。");
+            location.href = "index.html";
+            return;
+        }
+
+        document.getElementById("title").textContent = `${contactType}連絡`;
+        await loadKids();
+
+    } catch (e) {
+        console.error(e);
+        alert("初期化に失敗しました");
+    }
 }
 
 /****************************************************
