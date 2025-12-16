@@ -156,6 +156,7 @@ select {
 ================================ */
 @media screen and (max-width: 767px) {
   .container {
+    max-width: none;
     padding: 16px;
   }
 
