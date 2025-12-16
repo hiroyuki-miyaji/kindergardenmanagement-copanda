@@ -32,90 +32,90 @@
 
 </head>
 <body>
-
-<h2 id="title">連絡フォーム</h2>
-
-<!-- ① 園児選択 -->
-<div class="form-section">
-    <div class="row">
-        <label>園児を選んでください</label>
-        <div id="kidArea"></div>
+<div class="container">
+    <h2 id="title">連絡フォーム</h2>
+    
+    <!-- ① 園児選択 -->
+    <div class="form-section">
+        <div class="row">
+            <label>園児を選んでください</label>
+            <div id="kidArea"></div>
+        </div>
+    
+        <!-- ② 日付選択（園児選択後に活性化） -->
+        <div class="row hidden" id="calendarArea">
+          <label>日程</label>
+          <div id="calendarGrid" class="calendar-grid"></div>
+        </div>
     </div>
-
-    <!-- ② 日付選択（園児選択後に活性化） -->
-    <div class="row hidden" id="calendarArea">
-      <label>日程</label>
-      <div id="calendarGrid" class="calendar-grid"></div>
+    
+    
+    <!-- ③ 本体フォーム（最初は非表示） -->
+    <div id="formBody" class="form-section" style="display:none;">
+    
+        <!-- 欠席：荷物 -->
+        <div class="row" id="row-baggage">
+            <label>荷物持ち帰り</label>
+            <label class="inline-label"><input type="radio" name="baggage" value="園受け取り">園受け取り</label>
+            <label class="inline-label"><input type="radio" name="baggage" value="バス受け取り">バス受け取り</label>
+            <label class="inline-label"><input type="radio" name="baggage" value="兄弟児に持たせる">兄弟児に持たせる</label>
+            <label class="inline-label"><input type="radio" name="baggage" value="しない">しない</label>
+        </div>
+    
+        <!-- 遅刻：送り時間 -->
+        <div class="row" id="row-send">
+            <label>送り時間</label>
+            <select id="send"></select>
+        </div>
+    
+        <!-- 早退：お迎え時間 -->
+        <div class="row" id="row-pickup">
+            <label>お迎え時間</label>
+            <select id="pickup"></select>
+        </div>
+    
+        <!-- 理由（欠席/遅刻/早退 共通） -->
+        <div class="row" id="row-reason">
+            <label>理由</label>
+            <div id="reasonArea"></div>
+        </div>
+    
+        <!-- 備考 -->
+        <div class="row" id="row-memo">
+            <label>備考</label>
+            <input id="memo" type="text">
+        </div>
+    
+        <!-- 給食（必要日だけ表示） -->
+        <div class="row" id="row-lunch">
+            <label>給食</label>
+            <label class="inline-label"><input type="radio" name="lunch" value="必要">必要</label>
+            <label class="inline-label"><input type="radio" name="lunch" value="不要">不要</label>
+        </div>
+    
+        <!-- 早退 & バスキャンセル：保護者 -->
+        <div class="row" id="row-guardian">
+            <label>来園する保護者</label>
+            <label class="inline-label"><input type="radio" name="guardian" value="母親">母親</label>
+            <label class="inline-label"><input type="radio" name="guardian" value="父親">父親</label>
+            <label class="inline-label"><input type="radio" name="guardian" value="その他">その他</label>
+            <input id="guardianOther" type="text" placeholder="その他の場合入力">
+        </div>
+    
+        <!-- バスキャンセル：朝/帰 -->
+        <div class="row" id="row-bus">
+            <label>キャンセルバス</label>
+            <label class="inline-label"><input type="checkbox" id="bus_morning">朝バス</label>
+            <label class="inline-label"><input type="checkbox" id="bus_evening">帰りバス</label>
+        </div>
+    
+        <!-- 送信ボタン -->
+        <div class="row" style="text-align:center;">
+            <button id="btnBack" class="menu-btn" style="background:white;color:#c93056;border:2px solid #c93056;width:120px;">戻る</button>
+            <button id="btnSubmit" class="menu-btn" style="width:120px;">送信</button>
+        </div>
+    
     </div>
 </div>
-
-
-<!-- ③ 本体フォーム（最初は非表示） -->
-<div id="formBody" class="form-section" style="display:none;">
-
-    <!-- 欠席：荷物 -->
-    <div class="row" id="row-baggage">
-        <label>荷物持ち帰り</label>
-        <label class="inline-label"><input type="radio" name="baggage" value="園受け取り">園受け取り</label>
-        <label class="inline-label"><input type="radio" name="baggage" value="バス受け取り">バス受け取り</label>
-        <label class="inline-label"><input type="radio" name="baggage" value="兄弟児に持たせる">兄弟児に持たせる</label>
-        <label class="inline-label"><input type="radio" name="baggage" value="しない">しない</label>
-    </div>
-
-    <!-- 遅刻：送り時間 -->
-    <div class="row" id="row-send">
-        <label>送り時間</label>
-        <select id="send"></select>
-    </div>
-
-    <!-- 早退：お迎え時間 -->
-    <div class="row" id="row-pickup">
-        <label>お迎え時間</label>
-        <select id="pickup"></select>
-    </div>
-
-    <!-- 理由（欠席/遅刻/早退 共通） -->
-    <div class="row" id="row-reason">
-        <label>理由</label>
-        <div id="reasonArea"></div>
-    </div>
-
-    <!-- 備考 -->
-    <div class="row" id="row-memo">
-        <label>備考</label>
-        <input id="memo" type="text">
-    </div>
-
-    <!-- 給食（必要日だけ表示） -->
-    <div class="row" id="row-lunch">
-        <label>給食</label>
-        <label class="inline-label"><input type="radio" name="lunch" value="必要">必要</label>
-        <label class="inline-label"><input type="radio" name="lunch" value="不要">不要</label>
-    </div>
-
-    <!-- 早退 & バスキャンセル：保護者 -->
-    <div class="row" id="row-guardian">
-        <label>来園する保護者</label>
-        <label class="inline-label"><input type="radio" name="guardian" value="母親">母親</label>
-        <label class="inline-label"><input type="radio" name="guardian" value="父親">父親</label>
-        <label class="inline-label"><input type="radio" name="guardian" value="その他">その他</label>
-        <input id="guardianOther" type="text" placeholder="その他の場合入力">
-    </div>
-
-    <!-- バスキャンセル：朝/帰 -->
-    <div class="row" id="row-bus">
-        <label>キャンセルバス</label>
-        <label class="inline-label"><input type="checkbox" id="bus_morning">朝バス</label>
-        <label class="inline-label"><input type="checkbox" id="bus_evening">帰りバス</label>
-    </div>
-
-    <!-- 送信ボタン -->
-    <div class="row" style="text-align:center;">
-        <button id="btnBack" class="menu-btn" style="background:white;color:#c93056;border:2px solid #c93056;width:120px;">戻る</button>
-        <button id="btnSubmit" class="menu-btn" style="width:120px;">送信</button>
-    </div>
-
-</div>
-
 </body>
 </html>
