@@ -178,3 +178,46 @@ h1, h2, h3 {
         margin: 0;
     }
 }
+
+/* ================================
+ カレンダー Grid 
+================================ */
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  text-align: center;
+  margin-top: 10px;
+}
+
+.cal-head {
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.cal-day {
+  padding: 10px 0;
+  border-radius: 6px;
+  font-size: 15px;
+}
+
+.cal-day.selectable {
+  background: #fff;
+  border: 1px solid #c93056;
+  cursor: pointer;
+}
+
+.cal-day.lunch {
+  background: #fff3b0;
+}
+
+.cal-day.selected {
+  background: #c93056;
+  color: white;
+  font-weight: bold;
+}
+
+.hidden {
+  display: none !important;
+}
