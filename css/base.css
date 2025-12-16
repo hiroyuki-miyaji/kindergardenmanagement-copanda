@@ -226,21 +226,21 @@ h1, h2, h3 {
 ================================ */
 
 .calendar-header {
-  grid-column: span 7;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
+  margin: 10px 0;
+  font-size: 18px;
 }
 
 .calendar-header button {
-  background: none;
+  background: #fff;
   border: 1px solid #c93056;
   color: #c93056;
   border-radius: 6px;
-  font-size: 18px;
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
+  font-size: 20px;
 }
 
 .calendar-header span {
