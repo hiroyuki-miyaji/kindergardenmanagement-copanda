@@ -19,7 +19,7 @@ async function initPage() {
   }
 
   restoreAuthCode();
-  if (!window.AUTH_CODE) {
+  if (!AUTH_CODE) {
     alert("認証情報がありません。LINEから再度アクセスしてください。");
     location.href = "index.html";
     return;
