@@ -84,112 +84,92 @@ async function onKidSelected() {
 
     renderCalendarGrid(calendarData);
 }
+/****************************************************
+ * カレンダー開閉
+ ****************************************************/
+document.getElementById("calendarToggle")?.addEventListener("click", () => {
+  const area = document.getElementById("calendarArea");
+  area.classList.toggle("hidden");
+
+  if (!area.classList.contains("hidden")) {
+    renderCalendarGrid(calendarData);
+  }
+});
 
 /****************************************************
- * カレンダー Grid（月めくり・折りたたみ対応）
+ * カレンダー描画（月切替対応）
  ****************************************************/
-let currentYearMonth = null; // "YYYY-MM"
-
 function renderCalendarGrid({ calendar, lunchDates }) {
+  const grid = document.getElementById("calendarGrid");
+  grid.innerHTML = "";
 
-    const area = document.getElementById("calendarArea");
-    const grid = document.getElementById("calendarGrid");
-    const dateBox = document.getElementById("selectedDateBox");
-    const wrap = document.getElementById("calendarWrap");
+  const byMonth = {};
+  calendar.forEach(d => {
+    const ym = d.slice(0, 7);
+    (byMonth[ym] ||= []).push(d);
+  });
 
-    area.classList.remove("hidden");
+  const months = Object.keys(byMonth).sort();
+  if (!currentYearMonth) currentYearMonth = months[0];
 
-    // 折りたたみ制御
-    dateBox.onclick = () => {
-        wrap.classList.toggle("hidden");
+  draw();
+
+  function draw() {
+    grid.innerHTML = "";
+
+    const header = document.createElement("div");
+    header.className = "calendar-header";
+    header.innerHTML = `
+      <button type="button" id="prevMonth">‹</button>
+      <span>${currentYearMonth.replace("-", "年")}月</span>
+      <button type="button" id="nextMonth">›</button>
+    `;
+    grid.appendChild(header);
+
+    document.getElementById("prevMonth").onclick = () => {
+      const i = months.indexOf(currentYearMonth);
+      if (i > 0) { currentYearMonth = months[i - 1]; draw(); }
+    };
+    document.getElementById("nextMonth").onclick = () => {
+      const i = months.indexOf(currentYearMonth);
+      if (i < months.length - 1) { currentYearMonth = months[i + 1]; draw(); }
     };
 
-    // yyyy-mm でグルーピング
-    const byMonth = {};
-    calendar.forEach(d => {
-        const ym = d.slice(0, 7);
-        (byMonth[ym] ||= []).push(d);
-    });
+    ["日","月","火","水","木","金","土"].forEach(w =>
+      grid.insertAdjacentHTML("beforeend", `<div class="cal-head">${w}</div>`)
+    );
 
-    const months = Object.keys(byMonth).sort();
-    if (!currentYearMonth) currentYearMonth = months[0];
-
-    draw();
-
-    function draw() {
-        grid.innerHTML = "";
-
-        // ---- 月ヘッダ ----
-        const header = document.createElement("div");
-        header.className = "calendar-header";
-        header.innerHTML = `
-          <button type="button" id="prevMonth">‹</button>
-          <span>${currentYearMonth.replace("-", "年")}月</span>
-          <button type="button" id="nextMonth">›</button>
-        `;
-        grid.appendChild(header);
-
-        document.getElementById("prevMonth").onclick = () => {
-            const i = months.indexOf(currentYearMonth);
-            if (i > 0) {
-                currentYearMonth = months[i - 1];
-                draw();
-            }
-        };
-        document.getElementById("nextMonth").onclick = () => {
-            const i = months.indexOf(currentYearMonth);
-            if (i < months.length - 1) {
-                currentYearMonth = months[i + 1];
-                draw();
-            }
-        };
-
-        // ---- 曜日 ----
-        ["日","月","火","水","木","金","土"].forEach(w =>
-            grid.insertAdjacentHTML("beforeend", `<div class="cal-head">${w}</div>`)
-        );
-
-        // ---- 月の全日付を描画 ----
-        const [y, m] = currentYearMonth.split("-").map(Number);
-        const firstDay = new Date(y, m - 1, 1).getDay();
-        const lastDate = new Date(y, m, 0).getDate();
-        const enabledDates = byMonth[currentYearMonth];
-        const lunchSet = new Set(lunchDates ?? []);
-
-        // 前月空白
-        for (let i = 0; i < firstDay; i++) {
-            grid.insertAdjacentHTML("beforeend", `<div></div>`);
-        }
-
-        for (let d = 1; d <= lastDate; d++) {
-            const dateStr = `${y}-${String(m).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
-            const cell = document.createElement("div");
-            cell.textContent = d;
-
-            if (enabledDates.includes(dateStr)) {
-                cell.className = "cal-day selectable";
-
-                if (lunchSet.has(dateStr)) {
-                    cell.classList.add("lunch");
-                    cell.title = "給食あり";
-                }
-
-                cell.onclick = () => {
-                    document.querySelectorAll(".cal-day").forEach(c => c.classList.remove("selected"));
-                    cell.classList.add("selected");
-                    selectedDate = dateStr;
-                    dateBox.textContent = dateStr;
-                    wrap.classList.add("hidden");
-                    document.getElementById("formBody").style.display = "block";
-                    updateFormByType();
-                };
-            } else {
-                cell.className = "cal-day";
-            }
-
-            grid.appendChild(cell);
-        }
+    const dates = byMonth[currentYearMonth];
+    const first = new Date(dates[0]);
+    for (let i = 0; i < first.getDay(); i++) {
+      grid.insertAdjacentHTML("beforeend", `<div></div>`);
     }
+
+    dates.forEach(dateStr => {
+      const d = new Date(dateStr);
+      const cell = document.createElement("div");
+      cell.className = "cal-day selectable";
+      cell.textContent = d.getDate();
+
+      if ((lunchDates ?? []).includes(dateStr)) {
+        cell.classList.add("lunch");
+      }
+
+      cell.onclick = () => {
+        document.querySelectorAll(".cal-day").forEach(c => c.classList.remove("selected"));
+        cell.classList.add("selected");
+        selectedDate = dateStr;
+
+        // カレンダーを閉じる
+        document.getElementById("calendarArea").classList.add("hidden");
+
+        document.getElementById("formBody").style.display = "block";
+        updateFormByType();
+      };
+
+      grid.appendChild(cell);
+    });
+  }
 }
 
 /****************************************************
