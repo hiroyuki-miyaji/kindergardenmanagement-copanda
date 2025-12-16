@@ -89,7 +89,7 @@ async function onKidSelected() {
 /****************************************************
  * カレンダー開閉
  ****************************************************/
-document.getElementById("calendarToggle")?.addEventListener("click", () => {
+document.getElementById("selectedDateBox")?.addEventListener("click", () => {
   const area = document.getElementById("calendarArea");
   area.classList.toggle("hidden");
 
@@ -161,10 +161,11 @@ function renderCalendarGrid({ calendar, lunchDates }) {
         document.querySelectorAll(".cal-day").forEach(c => c.classList.remove("selected"));
         cell.classList.add("selected");
         selectedDate = dateStr;
+        document.getElementById("selectedDateBox").textContent =
+        dateStr.replace(/-/g, "/");
 
         // カレンダーを閉じる
         document.getElementById("calendarArea").classList.add("hidden");
-
         document.getElementById("formBody").style.display = "block";
         updateFormByType();
       };
