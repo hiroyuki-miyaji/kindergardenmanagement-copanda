@@ -218,6 +218,48 @@ function updateFormByType() {
     show("row-guardian");
   }
 }
+/****************************************************
+ * 送信処理
+ ****************************************************/
+document.getElementById("btnSubmit")?.addEventListener("click", onSubmitContact);
+
+async function onSubmitContact() {
+  try {
+    // ===== 必須チェック =====
+    if (!selectedKid) {
+      alert("園児を選択してください");
+      return;
+    }
+
+    if (!selectedDate) {
+      alert("日付を選択してください");
+      return;
+    }
+
+    const reason = document.querySelector("input[name=reason]:checked")?.value;
+    if (!reason && ["欠席","遅刻","早退"].includes(contactType)) {
+      alert("理由を選択してください");
+      return;
+    }
+
+    // ===== payload 作成 =====
+    const payload = buildSubmitPayload();
+
+    // ===== 送信 =====
+    document.getElementById("btnSubmit").disabled = true;
+
+    const res = await apiSubmitContact(payload);
+
+    alert("連絡を送信しました");
+    location.href = "index.html";
+
+  } catch (e) {
+    console.error(e);
+    alert("送信に失敗しました。もう一度お試しください。");
+  } finally {
+    document.getElementById("btnSubmit").disabled = false;
+  }
+}
 
 /****************************************************
  * 補助（未変更）
