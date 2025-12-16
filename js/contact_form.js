@@ -34,7 +34,7 @@ async function initPage() {
         }
 
         // 2) 認証確認（LIFF は触らない）
-        if (!window.AUTH_CODE) {
+        if (!AUTH_CODE) {
             alert("認証情報がありません。LINEから再度アクセスしてください。");
             location.href = "index.html";
             return;
@@ -56,7 +56,7 @@ async function initPage() {
  * 園児一覧取得
  ****************************************************/
 async function loadKids() {
-    const res = await apiGetKids(window.AUTH_CODE);
+    const res = await apiGetKids(AUTH_CODE);
 
     if (!res || !res.kids) {
         alert("園児情報が取得できませんでした。");
@@ -201,7 +201,7 @@ function setTimes(id, list) {
  ****************************************************/
 document.getElementById("btnSubmit").addEventListener("click", async () => {
     const payload = {
-        authCode: window.AUTH_CODE,
+        authCode: AUTH_CODE,
         kidsid: selectedKid.kidsid,
         date: selectedDate,
         type: contactType
