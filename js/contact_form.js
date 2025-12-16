@@ -83,6 +83,7 @@ async function onKidSelected() {
         return;
     }
 
+    document.getElementById("calendarArea").classList.remove("hidden");
     renderCalendarGrid(calendarData);
 }
 /****************************************************
