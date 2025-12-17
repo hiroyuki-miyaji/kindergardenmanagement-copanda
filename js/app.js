@@ -76,6 +76,7 @@ async function initIndexPage() {
     if (!profile) return;
 
     const lineId = profile.userId;
+    localStorage.setItem("LINE_ID", lineId); // ★保存
 
     // ★ LINEID → authcode の取得
     const result = await callApi({
