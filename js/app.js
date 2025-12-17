@@ -114,22 +114,19 @@ async function initIndexPage() {
 async function loadUpcomingContacts() {
     if (!AUTH_CODE) return;
 
-    // JST の今日を生成
+    // 今日の日付を生成
     const now = new Date();
-    const jst = new Date(now.getTime() + 9 * 60 * 60 * 1000);
+    const year = now.getUTCFullYear();
+    const month = String(now.getUTCMonth() + 1).padStart(2, "0");
+    const day = String(now.getUTCDate()).padStart(2, "0");
+    const today = `${year}-${month}-${day}`;  // 例: 2025-12-11
 
-    const year = jst.getUTCFullYear();
-    const month = String(jst.getUTCMonth() + 1).padStart(2, "0");
-    const day = String(jst.getUTCDate()).padStart(2, "0");
-
-    const todayJST = `${year}-${month}-${day}`;  // 例: 2025-12-11
-
-    console.log("JST dateFrom:", todayJST);
+    console.log("JST dateFrom:", today);
 
     const res = await callApi({
         action: "get_contacts",
         authCode: AUTH_CODE,
-        dateFrom: todayJST      // ← JST を送信（正しい）
+        dateFrom: today
     });
 
     const ul = document.getElementById("contactList");
