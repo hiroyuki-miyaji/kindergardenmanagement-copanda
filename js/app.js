@@ -121,7 +121,7 @@ async function loadUpcomingContacts() {
     const day = String(now.getUTCDate()).padStart(2, "0");
     const today = `${year}-${month}-${day}`;  // 例: 2025-12-11
 
-    console.log("JST dateFrom:", today);
+    console.log("dateFrom:", today);
 
     const res = await callApi({
         action: "get_contacts",
