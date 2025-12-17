@@ -264,7 +264,6 @@ async function onSubmitContact() {
 function buildSubmitPayload() {
   const payload = {
     action: "submit_contact",
-    lineId: lineId,
     authCode: AUTH_CODE,
     contactType,
     date: selectedDate,
