@@ -71,7 +71,7 @@ async function onKidSelected() {
   calendarData = await apiGetCalendar({
     contactType,
     className: selectedKid.class,
-    lunchAvailable: selectedKid.lunchAvailable
+    lunchAvailable: selectedKid.lunchAvailable,
     busUser: selectedKid.busUser
   });
 
