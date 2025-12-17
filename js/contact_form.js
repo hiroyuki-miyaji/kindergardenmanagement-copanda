@@ -264,6 +264,7 @@ async function onSubmitContact() {
 function buildSubmitPayload() {
   const payload = {
     action: "submit_contact",
+    lineId: localStorage.getItem("LINE_ID") || null, // ★追加
     authCode: AUTH_CODE,
     contactType,
     date: selectedDate,
