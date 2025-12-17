@@ -72,6 +72,7 @@ async function onKidSelected() {
     contactType,
     className: selectedKid.class,
     lunchAvailable: selectedKid.lunchAvailable
+    busUser: selectedKid.busUser
   });
 
   if (!calendarData?.calendar?.length) {
