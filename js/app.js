@@ -243,7 +243,6 @@ async function apiGetCalendar(params) {
 
 async function apiSubmitContact(payload) {
     payload.action = "submit_contact";
-    lineId: lineId,
     payload.authCode = AUTH_CODE;
     return await callApi(payload);
 }
