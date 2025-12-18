@@ -88,6 +88,7 @@ async function initIndexPage() {
             action: "check_guardian",
             lineId: lineId
         });
+    }
 
     if (result.error) {
         loading.innerHTML = "<p>通信エラーが発生しました。</p>";
