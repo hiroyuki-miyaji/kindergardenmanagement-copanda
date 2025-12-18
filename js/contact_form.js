@@ -214,7 +214,7 @@ function updateFormByType() {
     if (calendarData.lunchDates.includes(selectedDate)) show("row-lunch");
   }
 
-  if (contactType === "バスキャンセル") {
+  if (contactType === "園バス") {
     show("row-bus");
     show("row-guardian");
   }
@@ -302,7 +302,7 @@ function buildSubmitPayload() {
       document.querySelector("input[name=lunch]:checked")?.value || null;
   }
 
-  if (contactType === "バスキャンセル") {
+  if (contactType === "園バス") {
     payload.bus = {
       morning: document.getElementById("bus_morning")?.checked || false,
       evening: document.getElementById("bus_evening")?.checked || false
