@@ -251,6 +251,12 @@ async function onSubmitContact() {
 
     const res = await apiSubmitContact(payload);
 
+    // ★★★ 追加：Logic Apps のエラー判定 ★★★
+    if (!res || res.result !== "success") {
+      alert(res?.message || "送信に失敗しました。");
+      return; // ← ここで止める（画面遷移しない）
+    }
+    
     alert("連絡を送信しました");
     location.href = "index.html";
 
