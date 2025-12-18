@@ -83,6 +83,7 @@ async function initIndexPage() {
     localStorage.setItem("LINE_ID", lineId); // ★保存
 
     // ★ LINEID → authcode の取得
+    let result = null;
     if (!AUTH_CODE) {
         const result = await callApi({
             action: "check_guardian",
