@@ -191,12 +191,27 @@ function updateFormByType() {
   const hide = id => document.getElementById(id).style.display = "none";
 
   [
-    "row-baggage","row-send","row-pickup",
-    "row-lunch","row-guardian","row-bus"
+    "row-baggage",  //荷物持ち帰り
+    "row-send",     // 送り時間
+    "row-pickup",   // お迎え時間
+    "row-lunch",    // 給食
+    "row-guardian",  // 保護者
+    "row-bus",      // キャンセルバス
+    "row-reason",   // ★ 理由
+    "row-memo"      // ★ 備考
   ].forEach(hide);
+  
+  // ===== 理由・備考の制御 =====
+  if (["欠席", "遅刻", "早退"].includes(contactType)) {
+    show("row-reason");
+    show("row-memo");
+    setReasonOptions(contactType);
+  }
 
-  setReasonOptions(contactType);
-
+  if (contactType === "預かり保育") {
+    show("row-memo"); // 備考のみ
+  }
+  
   if (contactType === "欠席") {
     show("row-baggage");
   }
@@ -204,16 +219,29 @@ function updateFormByType() {
   if (contactType === "遅刻") {
     show("row-send");
     setSendTimes();
-    if (calendarData.lunchDates.includes(selectedDate)) show("row-lunch");
+    if (calendarData.lunchDates.includes(selectedDate)){
+      show("row-lunch");
+    }
   }
 
   if (contactType === "早退") {
     show("row-pickup");
     setPickupTimes();
     show("row-guardian");
-    if (calendarData.lunchDates.includes(selectedDate)) show("row-lunch");
+    if (calendarData.lunchDates.includes(selectedDate)){
+      show("row-lunch");
+    }
   }
 
+  if (contactType === "早退") {
+    show("row-pickup");
+    setPickupTimes();
+    show("row-guardian");
+    if (calendarData.lunchDates.includes(selectedDate)) {
+      show("row-lunch");
+    }
+  }
+  
   if (contactType === "園バス") {
     show("row-bus");
     show("row-guardian");
