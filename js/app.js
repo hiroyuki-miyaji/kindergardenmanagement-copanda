@@ -104,7 +104,7 @@ async function initIndexPage() {
     guardianNameLabel.textContent = `${result.guardianName} さん`;
 
     // ★ authcode を保持
-    AUTH_CODE = result.authcode;
+    AUTH_CODE = result.authCode;
     localStorage.setItem("AUTH_CODE", AUTH_CODE);
 
     loading.style.display = "none";
