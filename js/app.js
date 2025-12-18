@@ -73,16 +73,21 @@ async function initIndexPage() {
     restoreAuthCode();  // ★ まず復元
   
     const profile = await initLIFF();
-    if (!profile) return;
+    if (!profile) {
+        // ★ スマホ初回ログイン中に「止まった」ように見せない暫定対応
+        loading.innerHTML = "<p>ログイン中です…</p>";
+        return;
+    }
 
     const lineId = profile.userId;
     localStorage.setItem("LINE_ID", lineId); // ★保存
 
     // ★ LINEID → authcode の取得
-    const result = await callApi({
-        action: "check_guardian",
-        lineId: lineId
-    });
+    if (!AUTH_CODE) {
+        const result = await callApi({
+            action: "check_guardian",
+            lineId: lineId
+        });
 
     if (result.error) {
         loading.innerHTML = "<p>通信エラーが発生しました。</p>";
