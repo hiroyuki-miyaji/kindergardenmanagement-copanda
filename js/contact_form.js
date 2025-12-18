@@ -304,6 +304,7 @@ function buildSubmitPayload() {
     contactType,
     date: selectedDate,
     kid: selectedKid.kidsid,
+    busUser: selectedKid.busUser,
     reason: document.querySelector("input[name=reason]:checked")?.value || null,
     memo: document.getElementById("memo")?.value || null
   };
