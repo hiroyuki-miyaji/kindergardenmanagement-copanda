@@ -85,7 +85,7 @@ async function initIndexPage() {
     // ★ LINEID → authcode の取得
     let result = null;
     if (!AUTH_CODE) {
-        const result = await callApi({
+        result = await callApi({
             action: "check_guardian",
             lineId: lineId
         });
@@ -241,6 +241,7 @@ async function apiGetKids() {
 async function apiGetCalendar(params) {
     return await callApi({
         action: "get_calendar",
+        authCode: AUTH_CODE,
         ...params
     });
 }
