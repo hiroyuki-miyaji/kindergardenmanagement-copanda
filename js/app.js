@@ -70,47 +70,49 @@ async function initIndexPage() {
     const menu = document.getElementById("menu");
     const guardianNameLabel = document.getElementById("guardianName");
 
-    restoreAuthCode();  // ★ まず復元
-  
+    restoreAuthCode();  // ★ AUTH_CODE 復元
+
     const profile = await initLIFF();
     if (!profile) {
-        // ★ スマホ初回ログイン中に「止まった」ように見せない暫定対応
         loading.innerHTML = "<p>ログイン中です…</p>";
         return;
     }
 
     const lineId = profile.userId;
-    localStorage.setItem("LINE_ID", lineId); // ★保存
+    localStorage.setItem("LINE_ID", lineId);
 
-    // ★ LINEID → authcode の取得
     let result = null;
+
+    // ★ AUTH_CODE がないときだけ check_guardian
     if (!AUTH_CODE) {
         result = await callApi({
             action: "check_guardian",
             lineId: lineId
         });
+
+        if (result?.error) {
+            loading.innerHTML = "<p>通信エラーが発生しました。</p>";
+            return;
+        }
+
+        if (!result?.exists) {
+            window.location.href = "register_guardian.html";
+            return;
+        }
+
+        AUTH_CODE = result.authCode;
+        localStorage.setItem("AUTH_CODE", AUTH_CODE);
+        localStorage.setItem("GUARDIAN_NAME", result.guardianName);
+        guardianNameLabel.textContent = `${result.guardianName} さん`;
+    } else {
+        // ★ 既ログイン（通信しない）
+        const name = localStorage.getItem("GUARDIAN_NAME");
+        if (name) guardianNameLabel.textContent = `${name} さん`;
     }
-
-    if (result.error) {
-        loading.innerHTML = "<p>通信エラーが発生しました。</p>";
-        return;
-    }
-
-    if (!result.exists) {
-        window.location.href = "register_guardian.html";
-        return;
-    }
-
-    guardianNameLabel.textContent = `${result.guardianName} さん`;
-
-    // ★ authcode を保持
-    AUTH_CODE = result.authCode;
-    localStorage.setItem("AUTH_CODE", AUTH_CODE);
 
     loading.style.display = "none";
     menu.style.display = "block";
 
-    // ★ authcode を使い、本日以降の連絡を取得
     loadUpcomingContacts();
 }
 
