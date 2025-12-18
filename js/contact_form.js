@@ -337,10 +337,15 @@ function buildSubmitPayload() {
   }
 
   if (contactType === "園バス") {
-    payload.bus = {
-      morning: document.getElementById("bus_morning")?.checked || false,
-      evening: document.getElementById("bus_evening")?.checked || false
-    };
+    payload.busMorning =
+      document.getElementById("bus_morning")?.checked
+        ? document.getElementById("bus_morning").value
+        : null;
+
+    payload.busEvening =
+      document.getElementById("bus_evening")?.checked
+        ? document.getElementById("bus_evening").value
+        : null;
 
     payload.guardian =
       document.querySelector("input[name=guardian]:checked")?.value || null;
