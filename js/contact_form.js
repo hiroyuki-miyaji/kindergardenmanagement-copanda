@@ -191,10 +191,6 @@ function renderCalendarGrid({ calendar, lunchDates }) {
       }
 
       grid.appendChild(cell);
-      // ★ 預かり保育人数チェック
-      if (["預かり保育", "長期"].includes(contactType)) {
-        await checkChildcareLimit();
-      }
     }
   }
 }
