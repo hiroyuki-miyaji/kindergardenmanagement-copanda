@@ -435,7 +435,7 @@ function buildSubmitPayload() {
       document.getElementById("guardianOther")?.value || null;
   }
   
-  if (["預かり保育", "長期預かり保育"].includes(contactType)) {
+  if (["預かり保育", "長期"].includes(contactType)) {
     const care = getCareValue();
     if (!care) return null;
     payload.care = care;
@@ -455,7 +455,7 @@ if (allergyFlag === "あり") {
 }
   
 /* ★★★ 追加：長期預かり保育のみ ★★★ */
-if (contactType === "長期預かり保育") {
+if (contactType === "長期") {
   payload.longCareType =
     document.querySelector("input[name=long_base]:checked")?.value || null;
 }
@@ -487,7 +487,7 @@ function getCareValue() {
     }
   }
 
-  if (contactType === "長期預かり保育") {
+  if (contactType === "長期") {
     const base =
       document.querySelector("input[name=long_base]:checked")?.value;
     if (!base) {
