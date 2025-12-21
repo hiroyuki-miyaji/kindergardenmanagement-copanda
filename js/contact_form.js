@@ -454,6 +454,12 @@ if (allergyFlag === "あり") {
   payload.allergy = null;
 }
   
+/* ★★★ 追加：長期預かり保育のみ ★★★ */
+if (contactType === "長期預かり保育") {
+  payload.longCareType =
+    document.querySelector("input[name=long_base]:checked")?.value || null;
+}
+  
   return payload;
 }
 /****************************************************
