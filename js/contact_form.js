@@ -496,7 +496,6 @@ function getCareValue() {
     }
 
     if (document.getElementById("long_morning")?.checked) v.push("朝");
-    v.push(base);
     if (document.getElementById("long_ext1")?.checked) v.push("課外1");
     if (document.getElementById("long_ext2")?.checked) v.push("課外2");
   }
