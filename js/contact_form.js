@@ -69,7 +69,17 @@ async function onKidSelected() {
   const id = document.querySelector("input[name=kid]:checked")?.value;
   selectedKid = kidsData.find(k => k.kidsid === id);
   if (!selectedKid) return;
+  
+  // ★ 状態リセット（重要）
+  selectedDate = null;
+  currentYearMonth = null;
+  document.getElementById("formBody").style.display = "none";
+  document.getElementById("selectedDateBox").textContent =
+    "日付を選択してください ▼";
 
+  // ★ 予約人数表示を消す（後述）
+  hideChildcareStatus();
+  
   calendarData = await apiGetCalendar({
     contactType,
     className: selectedKid.class,
@@ -181,6 +191,10 @@ function renderCalendarGrid({ calendar, lunchDates }) {
       }
 
       grid.appendChild(cell);
+      // ★ 預かり保育人数チェック
+      if (["預かり保育", "長期"].includes(contactType)) {
+        await checkChildcareLimit();
+      }
     }
   }
 }
@@ -294,6 +308,7 @@ document.addEventListener("change", (e) => {
     e.target?.name === "long_extra"
   ) {
     updatePickupForCare();
+    if (selectedDate) checkChildcareLimit(); // ★ 追加
   }
 });
 /****************************************************
@@ -310,6 +325,77 @@ function setupAllergyUI() {
         : "none";
     });
   });
+}
+/****************************************************
+ * 預かり保育の予約済人数チェック
+ ****************************************************/
+async function checkChildcareLimit() {
+  const careType = getCareTypeForCheck();
+  if (!careType || !selectedDate) return;
+
+  const res = await apiCheckChildcare({
+    date: selectedDate,
+    type: contactType,
+    careType
+  });
+
+  if (!res) return;
+
+  showChildcareStatus(res);
+}
+
+function getCareTypeForCheck() {
+  if (contactType === "預かり保育") {
+    if (document.getElementById("normal_morning")?.checked) {
+      return "朝";
+    }
+    const base =
+      document.querySelector("input[name=normal_base]:checked")?.value;
+    return base || "午後";
+  }
+
+  if (contactType === "長期") {
+    return document.querySelector("input[name=long_base]:checked")?.value;
+  }
+
+  return null;
+}
+/****************************************************
+ * 預かり保育の予約済件数取得
+ ****************************************************/
+async function apiCheckChildcare({ date, type, careType }) {
+  return await callApi("check_childcare", {
+    date,
+    type,
+    careType
+  });
+}
+/****************************************************
+ * 預かり保育の予約済件数取得
+ ****************************************************/
+function showChildcareStatus({ limit, reserved }) {
+  const row = document.getElementById("childcareStatus");
+  const text = document.getElementById("childcareStatusText");
+
+  if (!row || !text) return;
+
+  row.style.display = "block";
+  text.textContent = `現在 ${reserved} 名 / 上限 ${limit} 名`;
+
+  const btn = document.getElementById("btnSubmit");
+
+  if (Number(reserved) >= Number(limit)) {
+    text.textContent += "（満員）";
+    btn.disabled = true;
+    alert("本日の預かり保育は定員に達しています。");
+  } else {
+    btn.disabled = false;
+  }
+}
+
+function hideChildcareStatus() {
+  const row = document.getElementById("childcareStatus");
+  if (row) row.style.display = "none";
 }
 /****************************************************
  * 送信処理
