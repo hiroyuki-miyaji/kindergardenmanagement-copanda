@@ -290,25 +290,23 @@ document.addEventListener("change", (e) => {
   if (e.target?.name === "long_base") {
     const isLong = e.target.value === "ロング";
 
-    const ext1 = document.getElementById("long_ext1");
-    const ext2 = document.getElementById("long_ext2");
+    const extras = document.querySelectorAll(
+      "input[name=long_extra]"
+    );
 
-    if (!ext1 || !ext2) return;
-
-    if (isLong) {
-      // ロング時：課外は不可
-      ext1.checked = false;
-      ext2.checked = false;
-      ext1.disabled = true;
-      ext2.disabled = true;
-    } else {
-      // ショート時：課外可
-      ext1.disabled = false;
-      ext2.disabled = false;
-    }
+    extras.forEach(radio => {
+      if (isLong) {
+        // ロング時：課外は不可
+        radio.checked = false;
+        radio.disabled = true;
+      } else {
+        // ショート時：課外可
+        radio.disabled = false;
+      }
+    });
   }
-
 });
+
 /****************************************************
  * アレルギー表示制御
  ****************************************************/
@@ -496,8 +494,14 @@ function getCareValue() {
     }
 
     if (document.getElementById("long_morning")?.checked) v.push("朝");
-    if (document.getElementById("long_ext1")?.checked) v.push("課外1");
-    if (document.getElementById("long_ext2")?.checked) v.push("課外2");
+    // 課外（ショート時のみ）
+    if (base === "ショート") {
+      const extra =
+        document.querySelector("input[name=long_extra]:checked")?.value;
+      if (extra) {
+        v.push(extra);
+      }
+    }
   }
 
   return v.join(" ");
