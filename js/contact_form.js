@@ -32,6 +32,8 @@ async function initPage() {
 
     document.getElementById("title").textContent = `${contactType}連絡`;
     await loadKids();
+    setupAllergyUI();
+
   } catch (e) {
     console.error(e);
     alert("初期化に失敗しました");
@@ -308,6 +310,21 @@ document.addEventListener("change", (e) => {
 
 });
 /****************************************************
+ * アレルギー表示制御
+ ****************************************************/
+function setupAllergyUI() {
+  const options = document.getElementById("allergy_options");
+  if (!options) return;
+
+  document.querySelectorAll("input[name=allergy_flag]").forEach(r => {
+    r.addEventListener("change", () => {
+      options.style.display = (r.value === "あり" && r.checked)
+        ? "block"
+        : "none";
+    });
+  });
+}
+/****************************************************
  * 送信処理
  ****************************************************/
 document.getElementById("btnSubmit")?.addEventListener("click", onSubmitContact);
@@ -423,8 +440,19 @@ function buildSubmitPayload() {
     if (!care) return null;
     payload.care = care;
   }
-  payload.allergy =
-    document.querySelector("input[name=allergy]:checked")?.value || null;
+// ===== アレルギー =====
+const allergyFlag =
+  document.querySelector("input[name=allergy_flag]:checked")?.value;
+
+if (allergyFlag === "あり") {
+  const items = Array.from(
+    document.querySelectorAll("input[name=allergy_item]:checked")
+  ).map(i => i.value);
+
+  payload.allergy = items.length ? items.join(" ") : null;
+} else {
+  payload.allergy = null;
+}
   
   return payload;
 }
