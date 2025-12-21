@@ -199,7 +199,8 @@ function updateFormByType() {
     "row-bus",      // キャンセルバス
     "row-reason",   // ★ 理由
     "row-memo",     // ★ 備考
-    "row-care"      // 預かり保育
+    "row-care",     // 預かり保育
+    "row-allergy"   // ★アレルギー
   ].forEach(hide);
   
   // ===== 理由・備考の制御 =====
@@ -213,6 +214,7 @@ function updateFormByType() {
     show("row-care");
     show("care-normal");
     hide("care-long");
+    show("row-allergy");
     show("row-memo");
   }
 
@@ -220,6 +222,7 @@ function updateFormByType() {
     show("row-care");
     show("care-long");
     hide("care-normal");
+    show("row-allergy");
     show("row-memo");
   }
   
@@ -420,6 +423,8 @@ function buildSubmitPayload() {
     if (!care) return null;
     payload.care = care;
   }
+  payload.allergy =
+    document.querySelector("input[name=allergy]:checked")?.value || null;
   
   return payload;
 }
