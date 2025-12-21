@@ -228,6 +228,11 @@ function updateFormByType() {
     show("row-memo");
   }
   
+  if (["預かり保育", "長期"].includes(contactType)) {
+    show("row-pickup");
+    updatePickupTimesForCare();
+  }
+  
   if (contactType === "欠席") {
     show("row-baggage");
   }
@@ -513,7 +518,7 @@ function getCareValue() {
   return v.join(" ");
 }
 /****************************************************
- * 補助（未変更）
+ * 補助
  ****************************************************/
 function setReasonOptions(type) {
   const map = {
@@ -533,7 +538,44 @@ function setReasonOptions(type) {
     `);
   });
 }
+/****************************************************
+ * 預かり保育用お迎え時間
+ ****************************************************/
+function updatePickupTimesForCare() {
+  let limited = false;
 
+  // ===== 通常 預かり保育 =====
+  if (contactType === "預かり保育") {
+    if (document.getElementById("normal_afternoon")?.checked) {
+      const base =
+        document.querySelector("input[name=normal_base]:checked")?.value;
+      if (["課外1", "課外2"].includes(base)) {
+        limited = true;
+      }
+    }
+  }
+
+  // ===== 長期 預かり保育 =====
+  if (contactType === "長期") {
+    const base =
+      document.querySelector("input[name=long_base]:checked")?.value;
+    const extra =
+      document.querySelector("input[name=long_extra]:checked")?.value;
+
+    if (base === "ショート" && ["課外1", "課外2"].includes(extra)) {
+      limited = true;
+    }
+  }
+
+  // ===== 時間セット =====
+  if (limited) {
+    setTimes("pickup", ["16:00", "17:00"]);
+  } else {
+    setPickupTimes(); // 既存ロジック
+  }
+}
+
+// ===== その他 =====
 function setSendTimes() {
   setTimes("send", ["9:30","10:00","10:30","11:00","11:30"]);
 }
