@@ -699,7 +699,3 @@ function setTimes(id, list) {
   sel.innerHTML = "";
   list.forEach(t => sel.insertAdjacentHTML("beforeend", `<option>${t}</option>`));
 }
-function restoreCareUIFromValue(careText) {
-  // "朝 課外1" などを分解してチェックを戻す
-  updatePickupForCare();
-}
