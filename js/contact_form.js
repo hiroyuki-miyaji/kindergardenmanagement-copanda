@@ -176,7 +176,7 @@ function renderCalendarGrid({ calendar, lunchDates }) {
           cell.classList.add("lunch");
         }
 
-        cell.onclick = () => {
+        cell.onclick = async () => {
           document.querySelectorAll(".cal-day").forEach(c => c.classList.remove("selected"));
           cell.classList.add("selected");
 
@@ -333,7 +333,9 @@ async function checkChildcareLimit() {
   const careType = getCareTypeForCheck();
   if (!careType || !selectedDate) return;
 
-  const res = await apiCheckChildcare({
+  const res = await callApi({
+    action: "check_childcare",
+    authCode: AUTH_CODE,
     date: selectedDate,
     type: contactType,
     careType
@@ -359,18 +361,6 @@ function getCareTypeForCheck() {
   }
 
   return null;
-}
-/****************************************************
- * 預かり保育の予約済件数取得
- ****************************************************/
-async function apiCheckChildcare({ date, type, careType }) {
-  return await callApi({
-    action: "check_childcare",
-    authCode: AUTH_CODE,
-    date,
-    type,
-    careType
-  });
 }
 /****************************************************
  * 預かり保育の予約済件数取得
