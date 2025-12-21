@@ -311,6 +311,20 @@ document.addEventListener("change", (e) => {
     });
   }
 });
+/****************************************************
+ * 預かり保育：お迎え時間制御
+ ****************************************************/
+document.addEventListener("change", (e) => {
+  if (
+    e.target?.id === "normal_morning" ||
+    e.target?.id === "normal_afternoon" ||
+    e.target?.name === "normal_base" ||
+    e.target?.name === "long_base" ||
+    e.target?.name === "long_extra"
+  ) {
+    updatePickupTimesForCare();
+  }
+});
 
 /****************************************************
  * アレルギー表示制御
@@ -539,19 +553,79 @@ function setReasonOptions(type) {
   });
 }
 /****************************************************
+ * 預かり保育：UI変更トリガー
+ ****************************************************/
+document.addEventListener("change", (e) => {
+
+  // 通常預かりのチェック・ラジオ
+  if (
+    e.target?.id === "normal_morning" ||
+    e.target?.id === "normal_afternoon" ||
+    e.target?.name === "normal_base"
+  ) {
+    updatePickupForCare();
+  }
+
+  // 長期預かり
+  if (
+    e.target?.name === "long_base" ||
+    e.target?.name === "long_extra"
+  ) {
+    updatePickupForCare();
+  }
+});/****************************************************
+ * 預かり保育用 お迎え時間と表示の制御
+ ****************************************************/
+function updatePickupForCare() {
+  updatePickupVisibilityForNormalCare();
+  updatePickupTimesForCare();
+}
+/****************************************************
+ * 通常預かり：朝のみの場合はお迎え時間を非表示
+ ****************************************************/
+function updatePickupVisibilityForNormalCare() {
+  if (contactType !== "預かり保育") return;
+
+  const morning = document.getElementById("normal_morning")?.checked;
+  const afternoon = document.getElementById("normal_afternoon")?.checked;
+
+  const row = document.getElementById("row-pickup");
+  if (!row) return;
+
+  // 朝のみ → 非表示
+  if (morning && !afternoon) {
+    row.style.display = "none";
+    return;
+  }
+
+  // それ以外 → 表示（時間は別関数で制御）
+  row.style.display = "block";
+}
+/****************************************************
  * 預かり保育用お迎え時間
  ****************************************************/
 function updatePickupTimesForCare() {
-  let limited = false;
+  let list = [];
 
   // ===== 通常 預かり保育 =====
   if (contactType === "預かり保育") {
-    if (document.getElementById("normal_afternoon")?.checked) {
-      const base =
-        document.querySelector("input[name=normal_base]:checked")?.value;
-      if (["課外後1", "課外後2"].includes(base)) {
-        limited = true;
-      }
+
+    // 朝のみ → 非表示
+    if (
+      document.getElementById("normal_morning")?.checked &&
+      !document.getElementById("normal_afternoon")?.checked
+    ) {
+      document.getElementById("row-pickup").style.display = "none";
+      return;
+    }
+
+    const base =
+      document.querySelector("input[name=normal_base]:checked")?.value;
+
+    if (["課外後1","課外後2"].includes(base)) {
+      list = PICKUP_TIME.CARE_C; // ③
+    } else {
+      list = PICKUP_TIME.CARE_A; // ①
     }
   }
 
@@ -559,21 +633,46 @@ function updatePickupTimesForCare() {
   if (contactType === "長期") {
     const base =
       document.querySelector("input[name=long_base]:checked")?.value;
-    const extra =
-      document.querySelector("input[name=long_extra]:checked")?.value;
 
-    if (base === "ショート" && ["課外後1", "課外後2"].includes(extra)) {
-      limited = true;
+    if (base === "ショート") {
+      const extra =
+        document.querySelector("input[name=long_extra]:checked")?.value;
+      list = ["課外後1","課外後2"].includes(extra)
+        ? PICKUP_TIME.CARE_C
+        : PICKUP_TIME.CARE_B;
+    }
+
+    if (base === "ロング") {
+      list = PICKUP_TIME.CARE_A;
     }
   }
 
-  // ===== 時間セット =====
-  if (limited) {
-    setTimes("pickup", ["16:00", "17:00"]);
-  } else {
-    setPickupTimes(); // 既存ロジック
-  }
+  document.getElementById("row-pickup").style.display = "block";
+  setTimes("pickup", list);
 }
+
+/****************************************************
+ * お迎え時間 定義（用途別）
+ ****************************************************/
+const PICKUP_TIME = {
+  // 遅刻・早退（既存）
+  DEFAULT: [
+    "10:00","10:30","11:00","11:30","12:00"
+  ],
+
+  // 預かり保育・長期 共通
+  CARE_A: [ // ①
+    "12:00","12:30","13:00","13:30",
+    "14:00","14:30","15:00","15:30",
+    "16:00","16:30","17:00"
+  ],
+  CARE_B: [ // ②
+    "12:00","12:30","13:00","13:30","14:00"
+  ],
+  CARE_C: [ // ③
+    "16:00","17:00"
+  ]
+};
 
 // ===== その他 =====
 function setSendTimes() {
