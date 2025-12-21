@@ -74,6 +74,67 @@
       <label class="inline-label"><input type="radio" name="baggage" value="兄弟児に持たせる">兄弟児に持たせる</label>
       <label class="inline-label"><input type="radio" name="baggage" value="しない">しない</label>
     </div>
+<!-- ★ 預かり保育／長期預かり保育（共通枠） -->
+<div class="row hidden" id="row-care">
+
+  <!-- ===== 通常 預かり保育 ===== -->
+  <div id="care-normal" class="hidden">
+    <label>預かり内容</label>
+
+    <label class="inline-label">
+      <input type="checkbox" id="normal_morning" value="朝">
+      朝
+    </label>
+
+    <label class="inline-label">
+      <input type="checkbox" id="normal_afternoon">
+      午後
+    </label>
+
+    <div id="normal_afternoon_options" class="sub-options hidden">
+      <label class="inline-label">
+        <input type="radio" name="normal_base" value="通常"> 通常
+      </label>
+      <label class="inline-label">
+        <input type="radio" name="normal_base" value="課外1"> 課外1
+      </label>
+      <label class="inline-label">
+        <input type="radio" name="normal_base" value="課外2"> 課外2
+      </label>
+    </div>
+  </div>
+
+  <!-- ===== 長期 預かり保育 ===== -->
+  <div id="care-long" class="hidden">
+    <label>滞在時間</label>
+
+    <label class="inline-label">
+      <input type="radio" name="long_base" value="ショート">
+      ショート（14時まで）
+    </label>
+
+    <label class="inline-label">
+      <input type="radio" name="long_base" value="ロング">
+      ロング（17時まで）
+    </label>
+
+    <div class="sub-options">
+      <label class="inline-label">
+        <input type="checkbox" id="long_morning" value="朝">
+        朝預
+      </label>
+      <label class="inline-label">
+        <input type="checkbox" id="long_ext1" value="課外1">
+        課外1
+      </label>
+      <label class="inline-label">
+        <input type="checkbox" id="long_ext2" value="課外2">
+        課外2
+      </label>
+    </div>
+  </div>
+
+</div>
 
     <div class="row" id="row-send">
       <label>送り時間</label>
