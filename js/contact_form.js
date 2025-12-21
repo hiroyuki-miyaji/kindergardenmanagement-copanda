@@ -230,11 +230,6 @@ function updateFormByType() {
     updatePickupForCare();
   }
   
-  if (["預かり保育", "長期"].includes(contactType)) {
-    show("row-pickup");
-    updatePickupTimesForCare();
-  }
-  
   if (contactType === "欠席") {
     show("row-baggage");
   }
@@ -249,22 +244,13 @@ function updateFormByType() {
 
   if (contactType === "早退") {
     show("row-pickup");
-    setPickupTimes();
+    setPickupTimesForLeave();
     show("row-guardian");
     if (calendarData.lunchDates.includes(selectedDate)){
       show("row-lunch");
     }
   }
-
-  if (contactType === "早退") {
-    show("row-pickup");
-    setPickupTimes();
-    show("row-guardian");
-    if (calendarData.lunchDates.includes(selectedDate)) {
-      show("row-lunch");
-    }
-  }
-  
+ 
   if (contactType === "園バス") {
     show("row-bus");
     show("row-guardian");
@@ -621,11 +607,15 @@ const PICKUP_TIME = {
 function setSendTimes() {
   setTimes("send", ["9:30","10:00","10:30","11:00","11:30"]);
 }
-function setPickupTimes() {
-  setTimes("pickup", ["10:00","10:30","11:00","11:30","12:00"]);
+function setPickupTimesForLeave() {
+  setTimes("pickup", PICKUP_TIME.DEFAULT);
 }
 function setTimes(id, list) {
   const sel = document.getElementById(id);
   sel.innerHTML = "";
   list.forEach(t => sel.insertAdjacentHTML("beforeend", `<option>${t}</option>`));
+}
+function restoreCareUIFromValue(careText) {
+  // "朝 課外1" などを分解してチェックを戻す
+  updatePickupForCare();
 }
