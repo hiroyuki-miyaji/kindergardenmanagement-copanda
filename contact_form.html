@@ -158,17 +158,42 @@
       <div id="reasonArea"></div>
     </div>
 
-    <div class="row" id="row-allergy">
-      <label>アレルギー</label>
-      <label class="inline-label">
-        <input type="radio" name="allergy" value="有">
-        有
-      </label>
-      <label class="inline-label">
-        <input type="radio" name="allergy" value="無" checked>
-        無
-      </label>
-    </div>
+<!-- ★ アレルギー -->
+<div class="row" id="row-allergy">
+  <label>アレルギー</label>
+
+  <label class="inline-label">
+    <input type="radio" name="allergy_flag" value="あり">
+    あり
+  </label>
+  <label class="inline-label">
+    <input type="radio" name="allergy_flag" value="なし" checked>
+    なし
+  </label>
+
+  <!-- 有の場合のみ表示 -->
+  <div id="allergy_options" style="display:none; margin-top:6px;">
+    <label class="inline-label">
+      <input type="checkbox" name="allergy_item" value="小麦"> 小麦
+    </label>
+    <label class="inline-label">
+      <input type="checkbox" name="allergy_item" value="ナッツ"> ナッツ
+    </label>
+    <label class="inline-label">
+      <input type="checkbox" name="allergy_item" value="卵"> 卵
+    </label>
+    <label class="inline-label">
+      <input type="checkbox" name="allergy_item" value="乳"> 乳
+    </label>
+    <label class="inline-label">
+      <input type="checkbox" name="allergy_item" value="甲殻類"> 甲殻類
+    </label>
+    <label class="inline-label">
+      <input type="checkbox" name="allergy_item" value="日光"> 日光
+    </label>
+  </div>
+</div>
+
     
     <div class="row" id="row-memo">
       <label>備考</label>
