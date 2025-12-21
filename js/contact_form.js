@@ -364,7 +364,9 @@ function getCareTypeForCheck() {
  * 預かり保育の予約済件数取得
  ****************************************************/
 async function apiCheckChildcare({ date, type, careType }) {
-  return await callApi("check_childcare", {
+  return await callApi({
+    action: "check_childcare",
+    authCode: AUTH_CODE,
     date,
     type,
     careType
