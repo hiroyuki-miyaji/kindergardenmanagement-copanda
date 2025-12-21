@@ -216,7 +216,7 @@ function updateFormByType() {
     show("row-memo");
   }
 
-  if (contactType === "長期預かり保育") {
+  if (contactType === "長期") {
     show("row-care");
     show("care-long");
     hide("care-normal");
