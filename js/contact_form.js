@@ -467,7 +467,10 @@ function getCareValue() {
   const v = [];
 
   if (contactType === "預かり保育") {
-    if (document.getElementById("normal_morning")?.checked) v.push("朝");
+    const morning = document.getElementById("normal_morning");
+    if (morning?.checked && morning.value) {
+      v.push(morning.value);
+    }
 
     if (document.getElementById("normal_afternoon")?.checked) {
       const base =
@@ -480,7 +483,7 @@ function getCareValue() {
     }
 
     if (v.length === 0) {
-      alert("朝または午後を選択してください");
+      alert("朝預または午後を選択してください");
       return null;
     }
   }
@@ -493,7 +496,10 @@ function getCareValue() {
       return null;
     }
 
-    if (document.getElementById("long_morning")?.checked) v.push("朝");
+    const longmorning = document.getElementById("long_morning");
+    if (longmorning?.checked && longmorning.value) {
+      v.push(longmorning.value);
+    }
     // 課外（ショート時のみ）
     if (base === "ショート") {
       const extra =
