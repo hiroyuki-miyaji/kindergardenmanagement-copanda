@@ -202,7 +202,9 @@ function updateFormByType() {
     "row-reason",   // ★ 理由
     "row-memo",     // ★ 備考
     "row-care",     // 預かり保育
-    "row-allergy"   // ★アレルギー
+    "row-allergy",  // ★アレルギー
+    "care-normal",  // 通常預かり保育
+    "care-long"     // 長期預かり保育
   ].forEach(hide);
   
   // ===== 理由・備考の制御 =====
@@ -215,17 +217,17 @@ function updateFormByType() {
   if (contactType === "預かり保育") {
     show("row-care");
     show("care-normal");
-    hide("care-long");
     show("row-allergy");
     show("row-memo");
+    updatePickupForCare();
   }
 
   if (contactType === "長期") {
     show("row-care");
     show("care-long");
-    hide("care-normal");
     show("row-allergy");
     show("row-memo");
+    updatePickupForCare();
   }
   
   if (["預かり保育", "長期"].includes(contactType)) {
@@ -269,52 +271,35 @@ function updateFormByType() {
   }
 }
 /****************************************************
- * 預かり保育：通常 午後チェック制御
+ * 預かり保育：以下の制御を実施
+ 通常午後チェックで午後の預かり内容表示
+ 長期ロングの場合課外後を非表示
+ お迎え時間の表示制御
  ****************************************************/
 document.addEventListener("change", (e) => {
+
+  // 通常：午後ON/OFF
   if (e.target?.id === "normal_afternoon") {
     const area = document.getElementById("normal_afternoon_options");
-    if (!area) return;
-
-    area.style.display = e.target.checked ? "block" : "none";
-
-    // 午後を外したらラジオ選択も解除
-    if (!e.target.checked) {
-      document
-        .querySelectorAll("input[name=normal_base]")
-        .forEach(r => r.checked = false);
+    if (area) {
+      area.style.display = e.target.checked ? "block" : "none";
+      if (!e.target.checked) {
+        document.querySelectorAll("input[name=normal_base]")
+          .forEach(r => r.checked = false);
+      }
     }
   }
-});
-/****************************************************
- * 預かり保育：長期（ショート／ロング）制御
- ****************************************************/
-document.addEventListener("change", (e) => {
 
-  // ===== ベース（ショート／ロング）切替 =====
+  // 長期：ショート／ロング
   if (e.target?.name === "long_base") {
     const isLong = e.target.value === "ロング";
-
-    const extras = document.querySelectorAll(
-      "input[name=long_extra]"
-    );
-
-    extras.forEach(radio => {
-      if (isLong) {
-        // ロング時：課外は不可
-        radio.checked = false;
-        radio.disabled = true;
-      } else {
-        // ショート時：課外可
-        radio.disabled = false;
-      }
+    document.querySelectorAll("input[name=long_extra]").forEach(r => {
+      r.checked = false;
+      r.disabled = isLong;
     });
   }
-});
-/****************************************************
- * 預かり保育：お迎え時間制御
- ****************************************************/
-document.addEventListener("change", (e) => {
+
+  // お迎え時間再計算
   if (
     e.target?.id === "normal_morning" ||
     e.target?.id === "normal_afternoon" ||
@@ -322,10 +307,9 @@ document.addEventListener("change", (e) => {
     e.target?.name === "long_base" ||
     e.target?.name === "long_extra"
   ) {
-    updatePickupTimesForCare();
+    updatePickupForCare();
   }
 });
-
 /****************************************************
  * アレルギー表示制御
  ****************************************************/
@@ -553,83 +537,41 @@ function setReasonOptions(type) {
   });
 }
 /****************************************************
- * 預かり保育：UI変更トリガー
- ****************************************************/
-document.addEventListener("change", (e) => {
-
-  // 通常預かりのチェック・ラジオ
-  if (
-    e.target?.id === "normal_morning" ||
-    e.target?.id === "normal_afternoon" ||
-    e.target?.name === "normal_base"
-  ) {
-    updatePickupForCare();
-  }
-
-  // 長期預かり
-  if (
-    e.target?.name === "long_base" ||
-    e.target?.name === "long_extra"
-  ) {
-    updatePickupForCare();
-  }
-});/****************************************************
- * 預かり保育用 お迎え時間と表示の制御
+ * お迎え時間 制御
  ****************************************************/
 function updatePickupForCare() {
-  updatePickupVisibilityForNormalCare();
-  updatePickupTimesForCare();
+  updatePickupVisibility();
+  updatePickupTimes();
 }
-/****************************************************
- * 通常預かり：朝のみの場合はお迎え時間を非表示
- ****************************************************/
-function updatePickupVisibilityForNormalCare() {
-  if (contactType !== "預かり保育") return;
 
-  const morning = document.getElementById("normal_morning")?.checked;
-  const afternoon = document.getElementById("normal_afternoon")?.checked;
-
+function updatePickupVisibility() {
   const row = document.getElementById("row-pickup");
   if (!row) return;
 
-  // 朝のみ → 非表示
-  if (morning && !afternoon) {
-    row.style.display = "none";
+  if (contactType === "預かり保育") {
+    const morning = document.getElementById("normal_morning")?.checked;
+    const afternoon = document.getElementById("normal_afternoon")?.checked;
+    row.style.display = (morning && !afternoon) ? "none" : "block";
     return;
   }
 
-  // それ以外 → 表示（時間は別関数で制御）
   row.style.display = "block";
 }
-/****************************************************
- * 預かり保育用お迎え時間
- ****************************************************/
-function updatePickupTimesForCare() {
+
+function updatePickupTimes() {
   let list = [];
 
-  // ===== 通常 預かり保育 =====
   if (contactType === "預かり保育") {
-
-    // 朝のみ → 非表示
-    if (
-      document.getElementById("normal_morning")?.checked &&
-      !document.getElementById("normal_afternoon")?.checked
-    ) {
-      document.getElementById("row-pickup").style.display = "none";
-      return;
-    }
-
     const base =
       document.querySelector("input[name=normal_base]:checked")?.value;
 
-    if (["課外後1","課外後2"].includes(base)) {
-      list = PICKUP_TIME.CARE_C; // ③
+    if (["課外後1", "課外後2"].includes(base)) {
+      list = PICKUP_TIME.CARE_C;
     } else {
-      list = PICKUP_TIME.CARE_A; // ①
+      list = PICKUP_TIME.CARE_A;
     }
   }
 
-  // ===== 長期 預かり保育 =====
   if (contactType === "長期") {
     const base =
       document.querySelector("input[name=long_base]:checked")?.value;
@@ -647,8 +589,9 @@ function updatePickupTimesForCare() {
     }
   }
 
-  document.getElementById("row-pickup").style.display = "block";
-  setTimes("pickup", list);
+  if (list.length) {
+    setTimes("pickup", list);
+  }
 }
 
 /****************************************************
