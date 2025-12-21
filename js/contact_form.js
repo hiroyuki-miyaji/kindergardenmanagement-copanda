@@ -195,10 +195,11 @@ function updateFormByType() {
     "row-send",     // 送り時間
     "row-pickup",   // お迎え時間
     "row-lunch",    // 給食
-    "row-guardian",  // 保護者
+    "row-guardian", // 保護者
     "row-bus",      // キャンセルバス
     "row-reason",   // ★ 理由
-    "row-memo"      // ★ 備考
+    "row-memo",     // ★ 備考
+    "row-care"      // 預かり保育
   ].forEach(hide);
   
   // ===== 理由・備考の制御 =====
@@ -209,7 +210,17 @@ function updateFormByType() {
   }
 
   if (contactType === "預かり保育") {
-    show("row-memo"); // 備考のみ
+    show("row-care");
+    show("care-normal");
+    hide("care-long");
+    show("row-memo");
+  }
+
+  if (contactType === "長期預かり保育") {
+    show("row-care");
+    show("care-long");
+    hide("care-normal");
+    show("row-memo");
   }
   
   if (contactType === "欠席") {
@@ -296,6 +307,9 @@ async function onSubmitContact() {
   }
 }
 
+/****************************************************
+ * payload 作成
+ ****************************************************/
 function buildSubmitPayload() {
   const payload = {
     action: "submit_contact",
@@ -354,10 +368,56 @@ function buildSubmitPayload() {
     payload.guardianOther =
       document.getElementById("guardianOther")?.value || null;
   }
-
+  
+  if (["預かり保育", "長期預かり保育"].includes(contactType)) {
+    const care = getCareValue();
+    if (!care) return null;
+    payload.care = care;
+  }
+  
   return payload;
 }
+/****************************************************
+ * 預かり内容生成（追加）
+ ****************************************************/
+function getCareValue() {
+  const v = [];
 
+  if (contactType === "預かり保育") {
+    if (document.getElementById("normal_morning")?.checked) v.push("朝");
+
+    if (document.getElementById("normal_afternoon")?.checked) {
+      const base =
+        document.querySelector("input[name=normal_base]:checked")?.value;
+      if (!base) {
+        alert("午後の内容を選択してください");
+        return null;
+      }
+      v.push(base);
+    }
+
+    if (v.length === 0) {
+      alert("朝または午後を選択してください");
+      return null;
+    }
+  }
+
+  if (contactType === "長期預かり保育") {
+    const base =
+      document.querySelector("input[name=long_base]:checked")?.value;
+    if (!base) {
+      alert("ショート／ロングを選択してください");
+      return null;
+    }
+
+    if (document.getElementById("long_morning")?.checked) v.push("朝");
+    v.push(base);
+    if (document.getElementById("long_ext1")?.checked) v.push("課外1");
+    if (document.getElementById("long_ext2")?.checked) v.push("課外2");
+  }
+
+  return v.join(" ");
+}
 /****************************************************
  * 補助（未変更）
  ****************************************************/
