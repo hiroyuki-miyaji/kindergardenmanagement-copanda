@@ -176,17 +176,8 @@ function renderCalendarGrid({ calendar, lunchDates }) {
           cell.classList.add("lunch");
         }
 
-        cell.onclick = async () => {
-          document.querySelectorAll(".cal-day").forEach(c => c.classList.remove("selected"));
-          cell.classList.add("selected");
-
-          selectedDate = dateStr;
-          document.getElementById("selectedDateBox").textContent =
-            dateStr.replace(/-/g, "/");
-
-          document.getElementById("calendarWrap").classList.add("hidden");
-          document.getElementById("formBody").style.display = "block";
-          updateFormByType();
+        cell.onclick = async (e) => {
+        await onDateSelected(dateStr, e.currentTarget);
         };
       }
 
@@ -194,6 +185,30 @@ function renderCalendarGrid({ calendar, lunchDates }) {
     }
   }
 }
+/****************************************************
+ * 日付選択時の処理
+ ****************************************************/
+async function onDateSelected(dateStr, cellEl) {
+  document.querySelectorAll(".cal-day")
+    .forEach(c => c.classList.remove("selected"));
+
+  cellEl?.classList.add("selected");
+
+  selectedDate = dateStr;
+
+  document.getElementById("selectedDateBox").textContent =
+    dateStr.replace(/-/g, "/");
+
+  document.getElementById("calendarWrap").classList.add("hidden");
+  document.getElementById("formBody").style.display = "block";
+
+  updateFormByType();
+
+  if (["預かり保育", "長期"].includes(contactType)) {
+    await checkChildcareSummary();
+  }
+}
+
 
 /****************************************************
  * 連絡区分別 UI 制御（未変更）
@@ -304,7 +319,6 @@ document.addEventListener("change", (e) => {
     e.target?.name === "long_extra"
   ) {
     updatePickupForCare();
-    if (selectedDate) checkChildcareLimit(); // ★ 追加
   }
 });
 /****************************************************
@@ -325,61 +339,57 @@ function setupAllergyUI() {
 /****************************************************
  * 預かり保育の予約済人数チェック
  ****************************************************/
-async function checkChildcareLimit() {
-  const careType = getCareTypeForCheck();
-  if (!careType || !selectedDate) return;
+async function checkChildcareSummary() {
+  if (!selectedDate) return;
 
   const res = await callApi({
     action: "check_childcare",
     authCode: AUTH_CODE,
     date: selectedDate,
-    type: contactType,
-    careType
+    careType: contactType // 「預かり保育」or「長期」
   });
 
-  if (!res) return;
-
-  showChildcareStatus(res);
-}
-
-function getCareTypeForCheck() {
-  if (contactType === "預かり保育") {
-    if (document.getElementById("normal_morning")?.checked) {
-      return "朝";
-    }
-    const base =
-      document.querySelector("input[name=normal_base]:checked")?.value;
-    return base || "午後";
+  if (!res?.ok || !res.detail) {
+    console.warn("定員情報を取得できませんでした");
+    return;
   }
 
-  if (contactType === "長期") {
-    return document.querySelector("input[name=long_base]:checked")?.value;
-  }
-
-  return null;
+  showChildcareSummary(res.detail);
 }
+
 /****************************************************
  * 預かり保育の予約済件数取得
  ****************************************************/
-function showChildcareStatus({ limit, reserved }) {
+function showChildcareSummary(detail) {
   const row = document.getElementById("childcareStatus");
   const text = document.getElementById("childcareStatusText");
-
-  if (!row || !text) return;
-
-  row.style.display = "block";
-  text.textContent = `現在 ${reserved} 名 / 上限 ${limit} 名`;
-
   const btn = document.getElementById("btnSubmit");
 
-  if (Number(reserved) >= Number(limit)) {
-    text.textContent += "（満員）";
-    btn.disabled = true;
-    alert("本日の預かり保育は定員に達しています。");
-  } else {
-    btn.disabled = false;
+  if (!row || !text || !btn) return;
+
+  row.style.display = "block";
+
+  const lines = [];
+
+  if (detail.morning) {
+    lines.push(
+      `朝：残り ${detail.morning.limit - detail.morning.reserved} 名`
+    );
   }
+
+  if (detail.afternoon) {
+    lines.push(
+      `午後：残り ${detail.afternoon.limit - detail.afternoon.reserved} 名`
+    );
+  }
+
+  text.innerHTML = lines.join("<br>");
+
+  // ★ ここでは送信不可にしない（Logic Apps に任せる）
+  btn.disabled = false;
 }
+
+
 
 function hideChildcareStatus() {
   const row = document.getElementById("childcareStatus");
