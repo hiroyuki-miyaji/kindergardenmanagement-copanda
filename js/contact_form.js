@@ -549,7 +549,7 @@ function updatePickupTimesForCare() {
     if (document.getElementById("normal_afternoon")?.checked) {
       const base =
         document.querySelector("input[name=normal_base]:checked")?.value;
-      if (["課外1", "課外2"].includes(base)) {
+      if (["課外後1", "課外後2"].includes(base)) {
         limited = true;
       }
     }
@@ -562,7 +562,7 @@ function updatePickupTimesForCare() {
     const extra =
       document.querySelector("input[name=long_extra]:checked")?.value;
 
-    if (base === "ショート" && ["課外1", "課外2"].includes(extra)) {
+    if (base === "ショート" && ["課外後1", "課外後2"].includes(extra)) {
       limited = true;
     }
   }
