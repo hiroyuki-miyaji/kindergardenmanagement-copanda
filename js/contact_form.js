@@ -259,6 +259,52 @@ function updateFormByType() {
   }
 }
 /****************************************************
+ * 預かり保育：通常 午後チェック制御
+ ****************************************************/
+document.addEventListener("change", (e) => {
+  if (e.target?.id === "normal_afternoon") {
+    const area = document.getElementById("normal_afternoon_options");
+    if (!area) return;
+
+    area.style.display = e.target.checked ? "block" : "none";
+
+    // 午後を外したらラジオ選択も解除
+    if (!e.target.checked) {
+      document
+        .querySelectorAll("input[name=normal_base]")
+        .forEach(r => r.checked = false);
+    }
+  }
+});
+/****************************************************
+ * 預かり保育：長期（ショート／ロング）制御
+ ****************************************************/
+document.addEventListener("change", (e) => {
+
+  // ===== ベース（ショート／ロング）切替 =====
+  if (e.target?.name === "long_base") {
+    const isLong = e.target.value === "ロング";
+
+    const ext1 = document.getElementById("long_ext1");
+    const ext2 = document.getElementById("long_ext2");
+
+    if (!ext1 || !ext2) return;
+
+    if (isLong) {
+      // ロング時：課外は不可
+      ext1.checked = false;
+      ext2.checked = false;
+      ext1.disabled = true;
+      ext2.disabled = true;
+    } else {
+      // ショート時：課外可
+      ext1.disabled = false;
+      ext2.disabled = false;
+    }
+  }
+
+});
+/****************************************************
  * 送信処理
  ****************************************************/
 document.getElementById("btnSubmit")?.addEventListener("click", onSubmitContact);
