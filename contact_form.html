@@ -206,7 +206,7 @@
     
     <div class="row" id="row-memo">
       <label>備考</label>
-      <input id="memo" type="text">
+      <textarea id="memo" maxlength="100" placeholder="備考（100文字以内）"></textarea>
     </div>
 
     <div class="row" id="row-lunch">
@@ -230,19 +230,11 @@
     </div>
 
     <div class="row btn-row">
-      <button
-        id="btnSubmit"
-        class="menu-btn"
-        type="button"
-      >
-        送信
-      </button>
-      <button
-        id="btnBack"
-        class="menu-btn btn-back"
-        type="button"
-      >
+      <button id="btnBack" class="menu-btn btn-back" type="button">
         戻る
+      </button>
+      <button id="btnSubmit" class="menu-btn" type="button" >
+        送信
       </button>
     </div>
 
