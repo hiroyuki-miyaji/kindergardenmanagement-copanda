@@ -374,13 +374,13 @@ function showChildcareSummary(detail) {
 
   if (detail.morning) {
     lines.push(
-      `朝：残り ${detail.morning.limit - detail.morning.reserved} 名`
+      `朝：残り ${detail.morning.limit - detail.morning.reserved} 名 (定員 ${detail.morning.limit} 名)`
     );
   }
 
   if (detail.afternoon) {
     lines.push(
-      `午後：残り ${detail.afternoon.limit - detail.afternoon.reserved} 名`
+      `午後：残り ${detail.afternoon.limit - detail.afternoon.reserved} 名 (定員 ${detail.morning.limit} 名)`
     );
   }
 
