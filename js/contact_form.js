@@ -461,6 +461,7 @@ async function onSubmitContact() {
       btn.disabled = false;
       btn.textContent = "送信";
     }
+  }
 }
 
 /****************************************************
