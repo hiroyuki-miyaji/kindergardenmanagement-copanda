@@ -78,6 +78,10 @@ h1, h2, h3 {
     max-width: 380px;
     margin: 0 auto 16px auto;
   }
+
+  .btn-row {
+    flex-direction: column;
+  }   
 }
 
 /* PC */
