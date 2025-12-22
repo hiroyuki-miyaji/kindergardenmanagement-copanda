@@ -17,14 +17,17 @@ h1, h2, h3 {
 ================================ */
 .menu-btn {
   display: block;
-  padding: 14px;
+  width: 90%;
+  max-width: 380px;
+  padding: 14px 16px;
   background: #c93056;
   color: white;
   text-align: center;
   border-radius: 8px;
-  border: none;
+  text-decoration: none;
+  box-sizing: border-box;
   font-size: 16px;
-  cursor: pointer;
+  margin: 0 auto 12px auto;
 }
 
 /* disabled（2重送信防止） */
@@ -87,7 +90,7 @@ h1, h2, h3 {
 /* PC */
 @media screen and (min-width: 768px) {
   .menu-btn {
-    width: 220px;
+    max-width: 420px;
   }
 }
 
