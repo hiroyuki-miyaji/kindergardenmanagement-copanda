@@ -367,6 +367,7 @@ function showChildcareSummary(detail) {
 
   if (!row || !text || !btn) return;
 
+  row.classList.remove("hidden");
   row.style.display = "block";
 
   const lines = [];
@@ -393,7 +394,10 @@ function showChildcareSummary(detail) {
 
 function hideChildcareStatus() {
   const row = document.getElementById("childcareStatus");
-  if (row) row.style.display = "none";
+  if (!row) return;
+
+  row.classList.add("hidden");
+  row.style.display = "none";
 }
 /****************************************************
  * 送信処理
