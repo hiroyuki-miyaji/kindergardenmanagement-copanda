@@ -61,3 +61,37 @@ h1, h2, h3 {
 .hidden {
   display: none !important;
 }
+/* ================================
+   フォーム用ボタン調整
+================================ */
+
+/* ボタン横並び */
+.btn-row {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+/* 戻るボタン（補助） */
+.btn-back {
+  background: #f0f0f0;      /* 薄いグレー */
+  color: #555;
+  border: 1px solid #ccc;
+}
+
+/* 戻るボタン hover */
+.btn-back:hover {
+  background: #e6e6e6;
+}
+
+/* 送信ボタン（主） */
+.menu-btn:not(.btn-back) {
+  background: #c93056;
+}
+
+/* disabled 状態（送信不可） */
+.menu-btn:disabled {
+  background: #ccc;
+  color: #888;
+  cursor: not-allowed;
+}
