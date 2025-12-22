@@ -95,3 +95,20 @@ h1, h2, h3 {
   color: #888;
   cursor: not-allowed;
 }
+/* ================================
+   フォーム入力 共通（スマホ最適化）
+================================ */
+input[type="text"],
+input[type="date"],
+select,
+textarea {
+  width: 100%;
+  height: 44px;              /* タップしやすい */
+  font-size: 16px;           /* iOSズーム防止 */
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #bbb;
+  box-sizing: border-box;
+  background: #fff;
+}
+
