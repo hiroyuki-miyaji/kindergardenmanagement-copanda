@@ -4,6 +4,7 @@ let selectedDate = null;
 let calendarData = null;
 let contactType = null;
 let currentYearMonth = null;
+let isSubmitting = false;
 
 /****************************************************
  * 初期化
@@ -408,6 +409,7 @@ function hideChildcareStatus() {
 document.getElementById("btnSubmit")?.addEventListener("click", onSubmitContact);
 
 async function onSubmitContact() {
+  
   try {
     // ===== 必須チェック =====
     if (!selectedKid) {
@@ -426,12 +428,17 @@ async function onSubmitContact() {
       return;
     }
 
+    if (isSubmitting) return; // ★ 二重送信防止
+    isSubmitting = true;
+
     // ===== payload 作成 =====
     const payload = buildSubmitPayload();
     if (!payload) return;
     
     // ===== 送信 =====
-    document.getElementById("btnSubmit").disabled = true;
+    const btn = document.getElementById("btnSubmit");
+    btn.disabled = true;
+    btn.textContent = "送信中…";
 
     const res = await apiSubmitContact(payload);
 
@@ -448,8 +455,12 @@ async function onSubmitContact() {
     console.error(e);
     alert("送信に失敗しました。もう一度お試しください。");
   } finally {
-    document.getElementById("btnSubmit").disabled = false;
-  }
+    isSubmitting = false;
+    const btn = document.getElementById("btnSubmit");
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = "送信";
+    }
 }
 
 /****************************************************
