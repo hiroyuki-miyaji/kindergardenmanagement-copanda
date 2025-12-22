@@ -561,19 +561,7 @@ if (contactType === "長期") {
  * 戻るボタン
  ****************************************************/
 document.getElementById("btnBack")?.addEventListener("click", () => {
-
-  // 日付選択済み → 日付を解除して戻る
-  if (selectedDate) {
-    selectedDate = null;
-    document.getElementById("formBody").style.display = "none";
-    document.getElementById("calendarWrap").classList.remove("hidden");
-    document.getElementById("selectedDateBox").textContent =
-      "日付を選択してください ▼";
-    hideChildcareStatus();
-    return;
-  }
-
-  // 日付未選択 → メニューへ
+  // メニューへ
   location.href = "index.html";
 });
 /****************************************************
