@@ -480,8 +480,6 @@ function buildSubmitPayload() {
   }
 
   if (contactType === "早退") {
-    payload.pickupTime = document.getElementById("pickup")?.value || null;
-
     payload.guardian =
       document.querySelector("input[name=guardian]:checked")?.value || null;
 
@@ -515,6 +513,11 @@ function buildSubmitPayload() {
     if (!care) return null;
     payload.care = care;
   }
+// =====お迎え時間 =====
+const pickupEl = document.getElementById("pickup");
+if (pickupEl && pickupEl.offsetParent !== null) {
+  payload.pickupTime = pickupEl.value || null;
+}
 // ===== アレルギー =====
 const allergyFlag =
   document.querySelector("input[name=allergy_flag]:checked")?.value;
