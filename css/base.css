@@ -36,9 +36,10 @@ body {
 }
 
 .home-link {
-  font-size: 14px;
+  font-size: 20px;     /* アイコンサイズ */
   text-decoration: none;
   color: #c93056;
+  line-height: 1;
 }
 /* ================================
    メニュー共通ボタン
