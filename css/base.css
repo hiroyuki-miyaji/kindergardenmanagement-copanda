@@ -3,21 +3,49 @@
 ================================ */
 body {
   font-family: sans-serif;
-  padding: 20px;
   background: #faf7ef;
   margin: 0;
 }
 
-h1, h2, h3 {
+.page-title {
   text-align: center;
 }
+/* ================================
+   共通ヘッダー
+================================ */
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: #fff;
+  border-bottom: 1px solid #ddd;
+}
 
+.header-inner {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.app-title {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.home-link {
+  font-size: 14px;
+  text-decoration: none;
+  color: #c93056;
+}
 /* ================================
    メニュー共通ボタン
 ================================ */
 .menu-btn {
   display: block;
-  width: 90%;
+  width: 100%;
   max-width: 380px;
   padding: 14px 16px;
   background: #c93056;
@@ -68,23 +96,40 @@ h1, h2, h3 {
   margin: 0 auto;
   max-width: 900px;
 }
+/* ================================
+   ページ共通レイアウト
+================================ */
+.page-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* PCでも中央揃え */
+.page-container h2,
+.page-container h3,
+.page-container .history {
+  text-align: left;
+}
 
 /* スマホ */
 @media screen and (max-width: 767px) {
+  .page-container {
+    padding: 16px;
+  }
+
+  .app-title {
+    font-size: 15px;
+  }
+
   .menu-container {
     display: block;
     text-align: center;
   }
-
-  .menu-btn {
-    width: 100%;
-    max-width: 380px;
-    margin: 0 auto 16px auto;
-  }
-
+   
   .btn-row {
     flex-direction: column;
-  }   
+  }
 }
 
 /* PC */
@@ -142,7 +187,14 @@ textarea {
   min-height: 90px;
   resize: vertical;
 }
-
+/* フォーカス時の視認性 */
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: #c93056;
+  box-shadow: 0 0 0 2px rgba(201,48,86,0.2);
+}
 /* ================================
    日付選択ボックス
 ================================ */
