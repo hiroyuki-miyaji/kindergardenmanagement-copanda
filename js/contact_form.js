@@ -262,7 +262,7 @@ function updateFormByType() {
   if (contactType === "遅刻") {
     show("row-send");
     setSendTimes();
-    if (calendarData.lunchDates.includes(selectedDate)){
+    if ((calendarData.lunchDates ?? []).includes(selectedDate)) {
       show("row-lunch");
     }
   }
@@ -271,7 +271,7 @@ function updateFormByType() {
     show("row-pickup");
     setPickupTimesForLeave();
     show("row-guardian");
-    if (calendarData.lunchDates.includes(selectedDate)){
+    if ((calendarData.lunchDates ?? []).includes(selectedDate)) {
       show("row-lunch");
     }
   }
@@ -371,26 +371,29 @@ function showChildcareSummary(detail) {
   row.style.display = "block";
 
   const lines = [];
+  let isFull = false;
 
   if (detail.morning) {
+    const remain = detail.morning.limit - detail.morning.reserved;
     lines.push(
       `朝：残り ${detail.morning.limit - detail.morning.reserved} 名 (定員 ${detail.morning.limit} 名)`
     );
+    if (remain <= 0) isFull = true;
   }
 
   if (detail.afternoon) {
+    const remain = detail.afternoon.limit - detail.afternoon.reserved;
     lines.push(
       `午後：残り ${detail.afternoon.limit - detail.afternoon.reserved} 名 (定員 ${detail.morning.limit} 名)`
     );
+    if (remain <= 0) isFull = true;
   }
 
   text.innerHTML = lines.join("<br>");
 
-  // ★ ここでは送信不可にしない（Logic Apps に任せる）
-  btn.disabled = false;
+  // ★ 両方満員なら送信不可
+  btn.disabled = isFull;
 }
-
-
 
 function hideChildcareStatus() {
   const row = document.getElementById("childcareStatus");
@@ -425,7 +428,8 @@ async function onSubmitContact() {
 
     // ===== payload 作成 =====
     const payload = buildSubmitPayload();
-
+    if (!payload) return;
+    
     // ===== 送信 =====
     document.getElementById("btnSubmit").disabled = true;
 
@@ -540,6 +544,26 @@ if (contactType === "長期") {
   
   return payload;
 }
+
+/****************************************************
+ * 戻るボタン
+ ****************************************************/
+document.getElementById("btnBack")?.addEventListener("click", () => {
+
+  // 日付選択済み → 日付を解除して戻る
+  if (selectedDate) {
+    selectedDate = null;
+    document.getElementById("formBody").style.display = "none";
+    document.getElementById("calendarWrap").classList.remove("hidden");
+    document.getElementById("selectedDateBox").textContent =
+      "日付を選択してください ▼";
+    hideChildcareStatus();
+    return;
+  }
+
+  // 日付未選択 → メニューへ
+  location.href = "index.html";
+});
 /****************************************************
  * 預かり内容生成（追加）
  ****************************************************/
