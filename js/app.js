@@ -150,9 +150,10 @@ async function loadUpcomingContacts() {
       const li = document.createElement("li");
     
       li.innerHTML = `
+        ${c.date} ${c.name ?? ""}    
         <a href="contact_form.html?mode=edit&contactId=${encodeURIComponent(c.contactId)}&type=${encodeURIComponent(c.type)}"
            class="contact-link">
-          ${c.date} ${c.name ?? ""}：${c.type}
+           ${c.type}
         </a>
       `;
     
