@@ -430,7 +430,7 @@ function updateFormByType() {
   if (contactType === "遅刻") {
     show("row-send");
     setSendTimes();
-    if ((calendarData && calendarData.lunchDates ?? []).includes(selectedDate)) {
+    if ((calendarData?.lunchDates ?? []).includes(selectedDate)) {
       show("row-lunch");
     }
   }
@@ -439,7 +439,7 @@ function updateFormByType() {
     show("row-pickup");
     setPickupTimesForLeave();
     show("row-guardian");
-    if ((calendarData && calendarData.lunchDates ?? []).includes(selectedDate)) {
+    if ((calendarData?.lunchDates ?? []).includes(selectedDate)) {
       show("row-lunch");
     }
   }
