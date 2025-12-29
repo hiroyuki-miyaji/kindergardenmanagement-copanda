@@ -35,10 +35,13 @@ async function initPage() {
       return;
     }
 
-    document.getElementById("title").textContent = mode === "edit" ? "連絡内容の確認・変更" : `${contactType}連絡`;
+        
+    if (mode === "new") {
+      await loadKids();              // ★ 新規のみ
+    }
     
-    await loadKids();
     if (mode === "edit") {
+      document.getElementById("title").textContent = "連絡内容の確認・変更" : `${contactType}連絡`;
       const detail = await loadContactDetail();  // ← ① 取得
       if (!detail) return;
     
