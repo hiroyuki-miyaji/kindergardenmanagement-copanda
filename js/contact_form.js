@@ -80,6 +80,7 @@ function applyEditRestrictions() {
     .forEach(r => (r.disabled = true));
 
   document.getElementById("selectedDateBox").classList.add("disabled");
+  document.getElementById("cancelArea").style.display = "block";
 
   // 預かり保育は「変更不可」
   if (["預かり保育", "長期"].includes(contactType)) {
