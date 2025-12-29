@@ -35,21 +35,28 @@ async function initPage() {
       return;
     }
 
-        
-    if (mode === "new") {
-      await loadKids();              // ★ 新規のみ
-    }
-    
+
+    /* =========================
+       ✏️ 編集モード
+       ========================= */
     if (mode === "edit") {
-      document.getElementById("title").textContent = `連絡内容の確認・変更 : ${contactType}連絡`;
-      const detail = await loadContactDetail();  // ← ① 取得
+      document.getElementById("title").textContent =
+        `連絡内容の確認・変更 : ${contactType}連絡`;
+
+      const detail = await loadContactDetail();
       if (!detail) return;
-    
-      restoreForm(detail);                      // ← ② ここで復元
-      applyEditRestrictions();                  // ← ③ 操作制限
+
+      restoreForm(detail);        // ← UI完全復元
+      applyEditRestrictions();    // ← 日付・園児・預かり制御
+
+      return; // ★★★ ここが最重要 ★★★
     }
-    
-    setupAllergyUI();
+
+    /* =========================
+       🆕 新規モード
+       ========================= */
+    await loadKids();             // 新規のみ
+    setupAllergyUI();             // 新規のみ
 
   } catch (e) {
     console.error(e);
