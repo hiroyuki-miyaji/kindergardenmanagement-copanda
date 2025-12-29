@@ -148,7 +148,21 @@ async function loadUpcomingContacts() {
 
     res.items.forEach(c => {
         const li = document.createElement("li");
-        li.textContent = `${c.date}：${c.name}：${c.type}`;
+    
+        li.textContent = `${c.date} ${c.name ?? ""}：${c.type}`;
+    
+        li.classList.add("contact-item");
+        li.style.cursor = "pointer";
+    
+        li.onclick = () => {
+            const url =
+              `contact_form.html?mode=edit` +
+              `&contactId=${encodeURIComponent(c.contactId)}` +
+              `&type=${encodeURIComponent(c.type)}`;
+    
+            location.href = url;
+        };
+    
         ul.appendChild(li);
     });
 }
