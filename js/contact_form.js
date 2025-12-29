@@ -74,6 +74,10 @@ async function loadContactDetail() {
  * 編集制御（重要）
  ****************************************************/
 function applyEditRestrictions() {
+  // ★ 園児選択の案内文を非表示
+  const label = document.getElementById("kidSelectLabel");
+  if (label) label.style.display = "none";
+  
   // 日付・園児は変更不可
   document
     .querySelectorAll("input[name=kid]")
