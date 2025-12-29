@@ -87,6 +87,8 @@ function applyEditRestrictions() {
   // ★ 園児選択の案内文を非表示
   const label = document.getElementById("kidSelectLabel");
   if (label) label.style.display = "none";
+  const kidArea = document.getElementById("kidArea");
+  if (kidArea) kidArea.style.display = "none";  
   
   // 日付・園児は変更不可
   document
@@ -134,7 +136,14 @@ function restoreForm(d) {
   );
   if (kidRadio) {
     kidRadio.checked = true;
-    selectedKid = kidsData.find(k => k.kidsid === d.kid);
+    // ===== 園児（編集モードは API 値で固定）=====
+    selectedKid = {
+      kidsid: d.kid,
+      name: d.kidName || "",          // あれば
+      class: d.className || null,     // check_childcare 用
+      lunchAvailable: d.lunchAvailable ?? true,
+      busUser: d.busUser ?? false
+    };
   }
   // ===== 日付（変更不可）=====
   selectedDate = d.date.slice(0, 10);
@@ -144,6 +153,9 @@ function restoreForm(d) {
   // ★ 日付選択不可
   document.getElementById("selectedDateBox").classList.add("disabled");
 
+  // ★ 編集モードでは即フォーム表示
+  document.getElementById("formBody").style.display = "block";
+  
   // ===== 理由 =====
   if (d.reason) {
     const r = document.querySelector(`input[name=reason][value="${d.reason}"]`);
@@ -199,6 +211,7 @@ function restoreForm(d) {
   }
 
   updateFormByType();
+  
 }
 
 /****************************************************
