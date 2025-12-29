@@ -34,7 +34,17 @@
   margin-right: 16px;
   font-size: 16px;
 }
+.notice-text {
+  font-size: 13px;
+  color: #999;
+  margin-bottom: 6px;
+}
 
+.btn-cancel {
+  background: #eee;
+  color: #666;
+  border: 1px solid #ccc;
+}
 /* ================================
    カレンダー折り畳み
 ================================ */
