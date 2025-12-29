@@ -139,6 +139,9 @@ body {
     max-width: 420px;
   }
 }
+.contact-item:hover {
+  background: #f5f5f5;
+}
 
 /* ================================
    フォーム共通
