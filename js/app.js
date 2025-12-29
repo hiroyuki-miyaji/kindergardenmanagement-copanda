@@ -147,24 +147,18 @@ async function loadUpcomingContacts() {
     }
 
     res.items.forEach(c => {
-        const li = document.createElement("li");
+      const li = document.createElement("li");
     
-        li.textContent = `${c.date} ${c.name ?? ""}：${c.type}`;
+      li.innerHTML = `
+        <a href="contact_form.html?mode=edit&contactId=${encodeURIComponent(c.contactId)}&type=${encodeURIComponent(c.type)}"
+           class="contact-link">
+          ${c.date} ${c.name ?? ""}：${c.type}
+        </a>
+      `;
     
-        li.classList.add("contact-item");
-        li.style.cursor = "pointer";
-    
-        li.onclick = () => {
-            const url =
-              `contact_form.html?mode=edit` +
-              `&contactId=${encodeURIComponent(c.contactId)}` +
-              `&type=${encodeURIComponent(c.type)}`;
-    
-            location.href = url;
-        };
-    
-        ul.appendChild(li);
+      ul.appendChild(li);
     });
+
 }
 
 
