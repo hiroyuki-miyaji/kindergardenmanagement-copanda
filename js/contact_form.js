@@ -5,7 +5,9 @@ let calendarData = null;
 let contactType = null;
 let currentYearMonth = null;
 let isSubmitting = false;
-
+// ★ 編集用
+let mode = "new";
+let contactId = null;
 /****************************************************
  * 初期化
  ****************************************************/
@@ -16,11 +18,13 @@ async function initPage() {
     if (typeof restoreAuthCode === "function") {
       restoreAuthCode();
     }
-    await Promise.resolve();
 
     const params = new URLSearchParams(location.search);
     contactType = params.get("type");
-    if (!contactType) {
+    mode = params.get("mode") || "new";
+    contactId = params.get("contactId");
+    
+    if (!contactType && mode === "new") {
       alert("連絡区分が指定されていません。");
       return;
     }
@@ -31,14 +35,176 @@ async function initPage() {
       return;
     }
 
-    document.getElementById("title").textContent = `${contactType}連絡`;
+    document.getElementById("title").textContent = mode === "edit" ? "連絡内容の確認" : `${contactType}連絡`;
+    
     await loadKids();
+    if (mode === "edit") {
+      const detail = await loadContactDetail();  // ← ① 取得
+      if (!detail) return;
+    
+      restoreForm(detail);                      // ← ② ここで復元
+      applyEditRestrictions();                  // ← ③ 操作制限
+    }
+    
     setupAllergyUI();
 
   } catch (e) {
     console.error(e);
     alert("初期化に失敗しました");
   }
+}
+
+/****************************************************
+ * 編集モード：連絡詳細取得
+ ****************************************************/
+async function loadContactDetail() {
+  if (!contactId) return null;
+
+  const res = await callApi({
+    action: "get_contact_detail",
+    contactId,
+    authCode: AUTH_CODE
+  });
+
+  if (!res?.items?.length) return null;
+
+  return res.items[0];
+}
+/****************************************************
+ * 編集制御（重要）
+ ****************************************************/
+function applyEditRestrictions() {
+  // 日付・園児は変更不可
+  document
+    .querySelectorAll("input[name=kid]")
+    .forEach(r => (r.disabled = true));
+
+  document.getElementById("selectedDateBox").classList.add("disabled");
+
+  // 預かり保育は「変更不可」
+  if (["預かり保育", "長期"].includes(contactType)) {
+    document.getElementById("btnSubmit").style.display = "none";
+  }
+
+  // 削除ボタン表示
+  const delBtn = document.getElementById("btnDelete");
+  const notice = document.getElementById("cancelLimitNotice");
+  
+  const isExpired =
+    !["預かり保育", "長期"].includes(contactType) &&
+    isAfterCancelLimit(selectedDate);
+
+  if (delBtn && !isExpired && !["預かり保育", "長期"].includes(contactType)) {
+    delBtn.style.display = "inline-block";
+    delBtn.onclick = onDeleteContact;
+  } else if (delBtn) {
+    delBtn.style.display = "none";
+  }
+
+  // ★ 補助テキスト表示
+  if (notice) {
+    notice.style.display = isExpired ? "block" : "none";
+  }
+}
+/****************************************************
+ * 画面復元
+ ****************************************************/
+function restoreForm(d) {
+  // ===== 連絡区分（変更不可だが判定用）=====
+  contactType = d.contactType;
+
+  // ===== 園児 =====
+  const kidRadio = document.querySelector(
+    `input[name=kid][value="${d.kid}"]`
+  );
+  if (kidRadio) {
+    kidRadio.checked = true;
+    selectedKid = kidsData.find(k => k.kidsid === d.kid);
+  }
+  // ===== 日付（変更不可）=====
+  selectedDate = d.date.slice(0, 10);
+  document.getElementById("selectedDateBox").textContent =
+    selectedDate.replace(/-/g, "/");
+
+  // ★ 日付選択不可
+  document.getElementById("selectedDateBox").classList.add("disabled");
+
+  // ===== 理由 =====
+  if (d.reason) {
+    const r = document.querySelector(`input[name=reason][value="${d.reason}"]`);
+    if (r) r.checked = true;
+  }
+
+  // ===== 備考 =====
+  if (d.memo) {
+    document.getElementById("memo").value = d.memo;
+  }
+
+  // ===== 荷物 =====
+  if (d.baggage) {
+    const b = document.querySelector(`input[name=baggage][value="${d.baggage}"]`);
+    if (b) b.checked = true;
+  }
+
+  // ===== 給食 =====
+  if (d.lunch) {
+    const l = document.querySelector(`input[name=lunch][value="${d.lunch}"]`);
+    if (l) l.checked = true;
+  }
+
+  // ===== 送り時間 =====
+  if (d.sendTime) {
+    document.getElementById("send").value = d.sendTime;
+  }
+
+  // ===== お迎え時間 =====
+  if (d.pickupTime) {
+    document.getElementById("pickup").value = d.pickupTime;
+  }
+
+  // ===== 保護者 =====
+  if (d.guardian) {
+    const g = document.querySelector(`input[name=guardian][value="${d.guardian}"]`);
+    if (g) g.checked = true;
+  }
+
+  if (d.guardianOther) {
+    document.getElementById("guardianOther").value = d.guardianOther;
+  }
+
+  // ===== アレルギー =====
+  if (d.allergy) {
+    document.querySelector(`input[name=allergy_flag][value="あり"]`).checked = true;
+    document.getElementById("allergy_options").style.display = "block";
+
+    d.allergy.split(" ").forEach(v => {
+      const a = document.querySelector(`input[name=allergy_item][value="${v}"]`);
+      if (a) a.checked = true;
+    });
+  }
+
+  updateFormByType();
+}
+
+/****************************************************
+ * 削除処理
+ ****************************************************/
+async function onDeleteContact() {
+  if (!confirm("この連絡をキャンセルしますか？")) return;
+
+  const res = await callApi({
+    action: "delete_contact",
+    contactId,
+    authCode: AUTH_CODE
+  });
+
+  if (res?.result !== "success") {
+    alert(res?.message || "キャンセルできませんでした");
+    return;
+  }
+
+  alert("キャンセルしました");
+  location.href = "contact_list.html";
 }
 
 /****************************************************
@@ -263,7 +429,7 @@ function updateFormByType() {
   if (contactType === "遅刻") {
     show("row-send");
     setSendTimes();
-    if ((calendarData.lunchDates ?? []).includes(selectedDate)) {
+    if ((calendarData && calendarData.lunchDates ?? []).includes(selectedDate)) {
       show("row-lunch");
     }
   }
@@ -272,7 +438,7 @@ function updateFormByType() {
     show("row-pickup");
     setPickupTimesForLeave();
     show("row-guardian");
-    if ((calendarData.lunchDates ?? []).includes(selectedDate)) {
+    if ((calendarData && calendarData.lunchDates ?? []).includes(selectedDate)) {
       show("row-lunch");
     }
   }
@@ -432,7 +598,10 @@ async function onSubmitContact() {
     isSubmitting = true;
 
     // ===== payload 作成 =====
-    const payload = buildSubmitPayload();
+    const payload = mode === "edit"
+        ? buildUpdatePayload()
+        : buildSubmitPayload();
+    
     if (!payload) return;
     
     // ===== 送信 =====
@@ -440,7 +609,10 @@ async function onSubmitContact() {
     btn.disabled = true;
     btn.textContent = "送信中…";
 
-    const res = await apiSubmitContact(payload);
+    const res = mode === "edit"
+        ? await callApi(payload)
+        : await apiSubmitContact(payload);
+    
 
     // ★★★ 追加：Logic Apps のエラー判定 ★★★
     if (!res || res.result !== "success") {
@@ -556,7 +728,92 @@ if (contactType === "長期") {
   
   return payload;
 }
+/****************************************************
+ * 更新用 payload
+ ****************************************************/
+function buildUpdatePayload() {
+  const payload = {
+    action: "update_contact",
+    authCode: AUTH_CODE,
+    contactId,               // ★必須
+    contactType              // ★判定用（変更不可だが送る）
+  };
 
+  // ===== 理由・備考 =====
+  payload.reason =
+    document.querySelector("input[name=reason]:checked")?.value || null;
+
+  payload.memo =
+    document.getElementById("memo")?.value || null;
+
+  // ===== 欠席 =====
+  if (contactType === "欠席") {
+    payload.baggage =
+      document.querySelector("input[name=baggage]:checked")?.value || null;
+
+    payload.lunch =
+      document.querySelector("input[name=lunch]:checked")?.value || null;
+  }
+
+  // ===== 遅刻 =====
+  if (contactType === "遅刻") {
+    payload.sendTime =
+      document.getElementById("send")?.value || null;
+
+    payload.lunch =
+      document.querySelector("input[name=lunch]:checked")?.value || null;
+  }
+
+  // ===== 早退 =====
+  if (contactType === "早退") {
+    payload.pickupTime =
+      document.getElementById("pickup")?.value || null;
+
+    payload.guardian =
+      document.querySelector("input[name=guardian]:checked")?.value || null;
+
+    payload.guardianOther =
+      document.getElementById("guardianOther")?.value || null;
+
+    payload.lunch =
+      document.querySelector("input[name=lunch]:checked")?.value || null;
+  }
+
+  // ===== 園バス =====
+  if (contactType === "園バス") {
+    payload.busMorning =
+      document.getElementById("bus_morning")?.checked
+        ? document.getElementById("bus_morning").value
+        : null;
+
+    payload.busEvening =
+      document.getElementById("bus_evening")?.checked
+        ? document.getElementById("bus_evening").value
+        : null;
+
+    payload.guardian =
+      document.querySelector("input[name=guardian]:checked")?.value || null;
+
+    payload.guardianOther =
+      document.getElementById("guardianOther")?.value || null;
+  }
+
+  // ===== アレルギー =====
+  const allergyFlag =
+    document.querySelector("input[name=allergy_flag]:checked")?.value;
+
+  if (allergyFlag === "あり") {
+    const items = Array.from(
+      document.querySelectorAll("input[name=allergy_item]:checked")
+    ).map(i => i.value);
+
+    payload.allergy = items.length ? items.join(" ") : null;
+  } else {
+    payload.allergy = null;
+  }
+
+  return payload;
+}
 /****************************************************
  * 戻るボタン
  ****************************************************/
@@ -717,7 +974,19 @@ const PICKUP_TIME = {
     "16:00","17:00"
   ]
 };
+// 9:10判定用ユーティリティ
+function isAfterCancelLimit(dateStr) {
+  if (!dateStr) return false;
 
+  const now = new Date();
+  const target = new Date(dateStr + "T09:10:00");
+
+  // 当日かつ 9:10 超え
+  return (
+    now.toDateString() === target.toDateString() &&
+    now > target
+  );
+}
 // ===== その他 =====
 function setSendTimes() {
   setTimes("send", ["9:30","10:00","10:30","11:00","11:30"]);
