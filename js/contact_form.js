@@ -35,7 +35,7 @@ async function initPage() {
       return;
     }
 
-    document.getElementById("title").textContent = mode === "edit" ? "連絡内容の確認" : `${contactType}連絡`;
+    document.getElementById("title").textContent = mode === "edit" ? "連絡内容の確認・変更" : `${contactType}連絡`;
     
     await loadKids();
     if (mode === "edit") {
@@ -84,8 +84,9 @@ function applyEditRestrictions() {
     .forEach(r => (r.disabled = true));
 
   document.getElementById("selectedDateBox").classList.add("disabled");
-  document.getElementById("cancelArea").style.display = "block";
-
+  const cancelArea = document.getElementById("cancelArea");
+  if (cancelArea) cancelArea.style.display = "block";
+  
   // 預かり保育は「変更不可」
   if (["預かり保育", "長期"].includes(contactType)) {
     document.getElementById("btnSubmit").style.display = "none";
@@ -96,8 +97,7 @@ function applyEditRestrictions() {
   const notice = document.getElementById("cancelLimitNotice");
   
   const isExpired =
-    !["預かり保育", "長期"].includes(contactType) &&
-    isAfterCancelLimit(selectedDate);
+    selectedDate && !["預かり保育", "長期"].includes(contactType) && isAfterCancelLimit(selectedDate);
 
   if (delBtn && !isExpired && !["預かり保育", "長期"].includes(contactType)) {
     delBtn.style.display = "inline-block";
@@ -231,7 +231,10 @@ async function loadKids() {
     `);
   });
 
-  area.addEventListener("change", onKidSelected);
+  if (mode === "new") {
+    area.addEventListener("change", onKidSelected);
+  }
+
 }
 
 /****************************************************
@@ -386,6 +389,7 @@ async function onDateSelected(dateStr, cellEl) {
  * 連絡区分別 UI 制御（未変更）
  ****************************************************/
 function updateFormByType() {
+  if (mode === "edit" && !selectedDate) return;
   const show = id => document.getElementById(id).style.display = "block";
   const hide = id => document.getElementById(id).style.display = "none";
 
@@ -583,16 +587,16 @@ async function onSubmitContact() {
   
   try {
     // ===== 必須チェック =====
-    if (!selectedKid) {
+    if (!selectedKid && mode === "new") {
       alert("園児を選択してください");
       return;
     }
-
-    if (!selectedDate) {
+  
+    if (!selectedDate && mode === "new") {
       alert("日付を選択してください");
       return;
     }
-
+    
     const reason = document.querySelector("input[name=reason]:checked")?.value;
     if (!reason && ["欠席","遅刻","早退"].includes(contactType)) {
       alert("理由を選択してください");
