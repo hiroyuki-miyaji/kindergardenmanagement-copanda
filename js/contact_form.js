@@ -47,6 +47,7 @@ async function initPage() {
       if (!detail) return;
 
       restoreForm(detail);        // ← UI完全復元
+      setupAllergyUI();
       applyEditRestrictions();    // ← 日付・園児・預かり制御
 
       return; // ★★★ ここが最重要 ★★★
@@ -76,9 +77,11 @@ async function loadContactDetail() {
     authCode: AUTH_CODE
   });
 
-  if (!res?.items?.length) return null;
+  if (res?.result !== "success" || !res.items) {
+    return null;
+  }
 
-  return res.items[0];
+  return res.items; // ★ そのまま返す
 }
 /****************************************************
  * 編集制御（重要）
