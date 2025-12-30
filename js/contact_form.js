@@ -77,11 +77,11 @@ async function loadContactDetail() {
     authCode: AUTH_CODE
   });
 
-  if (res?.result !== "success" || !res.items) {
+  if (res?.result !== "success" || !res.contact) {
     return null;
   }
 
-  return res.items; // ★ そのまま返す
+  return res.contact; // ★ そのまま返す
 }
 /****************************************************
  * 編集制御（重要）
@@ -133,26 +133,20 @@ function restoreForm(d) {
   // ===== 連絡区分（変更不可だが判定用）=====
   contactType = d.contactType;
 
-  // ===== 園児 =====
-  const kidRadio = document.querySelector(
-    `input[name=kid][value="${d.kid}"]`
-  );
-  if (kidRadio) {
-    kidRadio.checked = true;
-    // ===== 園児（編集モードは API 値で固定）=====
-    selectedKid = {
-      kidsid: d.kid,
-      name: d.kidName || "",          // あれば
-      class: d.className || null,     // check_childcare 用
-      lunchAvailable: d.lunchAvailable ?? true,
-      busUser: d.busUser ?? false
-    };
-  }
+  // ===== 園児（編集モードは API 値で固定）=====
+  selectedKid = {
+    kidsid: d.kids.kidsId,
+    name: d.kids.name,
+    class: d.kids.className,
+    lunchAvailable: d.kids.lunchAvailable,
+    busUser: d.kids.busUser
+  };
 
-  updateFormByType();
   
   // ===== 日付（変更不可）=====
   selectedDate = d.date.slice(0, 10);
+  updateFormByType();
+
   document.getElementById("selectedDateBox").textContent =
     selectedDate.replace(/-/g, "/");
 
