@@ -148,6 +148,9 @@ function restoreForm(d) {
       busUser: d.busUser ?? false
     };
   }
+
+  updateFormByType();
+  
   // ===== 日付（変更不可）=====
   selectedDate = d.date.slice(0, 10);
   document.getElementById("selectedDateBox").textContent =
@@ -211,10 +214,7 @@ function restoreForm(d) {
       const a = document.querySelector(`input[name=allergy_item][value="${v}"]`);
       if (a) a.checked = true;
     });
-  }
-
-  updateFormByType();
-  
+  }  
 }
 
 /****************************************************
@@ -415,7 +415,7 @@ async function onDateSelected(dateStr, cellEl) {
  * 連絡区分別 UI 制御（未変更）
  ****************************************************/
 function updateFormByType() {
-  if (mode === "edit" && !selectedDate) return;
+  if (mode === "new" && !selectedDate) return;
   const show = id => document.getElementById(id).style.display = "block";
   const hide = id => document.getElementById(id).style.display = "none";
 
