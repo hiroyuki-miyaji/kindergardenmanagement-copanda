@@ -32,45 +32,61 @@
   </header>
 
   <h2 id="title">連絡フォーム</h2>
-  
+  <!-- =========================
+     ★ 表示モード（新設）
+     ========================= -->
+<div id="viewArea" class="form-section" style="display:none;">
+
+  <div class="row">
+    <label>園児</label>
+    <span id="viewKid" class="view-text"></span>
+  </div>
+
+  <div class="row">
+    <label>日付</label>
+    <span id="viewDate" class="view-text"></span>
+  </div>
+
+  <div class="row">
+    <label>連絡内容</label>
+    <div id="viewDetail" class="view-detail"></div>
+  </div>
+
+  <div class="row btn-row">
+    <button id="btnEdit" class="menu-btn" type="button">編集</button>
+    <button id="btnDeleteView" class="menu-btn btn-cancel" type="button">キャンセル</button>
+  </div>
+</div>
+
   <!-- ① 園児選択 -->
   <div class="form-section">
-  <div class="row">
-    <label id="kidSelectLabel">園児</label>
-    <div id="kidArea" class="kids-area"></div>
-  </div>
+    
+    <div class="row">
+      <label id="kidSelectLabel">園児</label>
+      <div id="kidArea" class="kids-area"></div>
+    </div>
 
     <!-- ② 日付選択（折り畳み） -->
     <div class="row hidden" id="calendarArea">
       <label>日程</label>
 
       <div id="childcareStatus" class="row hidden">
-      <label>本日の預かり保育</label>
-      <div id="childcareStatusText"></div>
-    </div>
+        <label>本日の預かり保育</label>
+        <div id="childcareStatusText"></div>
+      </div>
 
       <!-- 選択済み日付表示（トグル） -->
-      <button
-        type="button"
-        id="selectedDateBox"
-        class="date-box"
-        aria-expanded="false"
-      >
+      <button type="button" id="selectedDateBox" class="date-box">
         日付を選択してください ▼
       </button>
-
+  
       <!-- 折り畳みカレンダー -->
-      <div
-        id="calendarWrap"
-        class="calendar-wrap"
-        aria-hidden="true"
-      >
+      <div id="calendarWrap" class="calendar-wrap">
         <div class="calendar-header">
           <button type="button" id="prevMonth" aria-label="前の月">‹</button>
           <span id="calendarTitle"></span>
           <button type="button" id="nextMonth" aria-label="次の月">›</button>
         </div>
-
         <div id="calendarGrid" class="calendar-grid"></div>
       </div>
     </div>
@@ -86,78 +102,76 @@
       <label class="inline-label"><input type="radio" name="baggage" value="兄弟児に持たせる">兄弟児に持たせる</label>
       <label class="inline-label"><input type="radio" name="baggage" value="しない">しない</label>
     </div>
-<!-- ★ 預かり保育／長期預かり保育 -->
-<div class="row" id="row-care" style="display:none;">
-
-  <!-- ===== 通常 預かり保育 ===== -->
-  <div id="care-normal" style="display:none;">
-    <label>預かり内容</label>
-
-    <label class="inline-label">
-      <input type="checkbox" id="normal_morning" value="朝預">
-      朝預
-    </label>
-
-    <label class="inline-label">
-      <input type="checkbox" id="normal_afternoon">
-      午後
-    </label>
-
-    <!-- 午後チェック時に表示 -->
-    <div id="normal_afternoon_options" class="sub-options" style="display:none;">
-      <label class="inline-label">
-        <input type="radio" name="normal_base" value="通常">
-        通常
-      </label>
-      <label class="inline-label">
-        <input type="radio" name="normal_base" value="課外後1">
-        課外後1
-      </label>
-      <label class="inline-label">
-        <input type="radio" name="normal_base" value="課外後2">
-        課外後2
-      </label>
+    <!-- ★ 預かり保育／長期預かり保育 -->
+    <div class="row" id="row-care" style="display:none;">
+    
+      <!-- ===== 通常 預かり保育 ===== -->
+      <div id="care-normal" style="display:none;">
+        <label>預かり内容</label>
+    
+        <label class="inline-label">
+          <input type="checkbox" id="normal_morning" value="朝預">
+          朝預
+        </label>
+    
+        <label class="inline-label">
+          <input type="checkbox" id="normal_afternoon">
+          午後
+        </label>
+    
+        <!-- 午後チェック時に表示 -->
+        <div id="normal_afternoon_options" class="sub-options" style="display:none;">
+          <label class="inline-label">
+            <input type="radio" name="normal_base" value="通常">
+            通常
+          </label>
+          <label class="inline-label">
+            <input type="radio" name="normal_base" value="課外後1">
+            課外後1
+          </label>
+          <label class="inline-label">
+            <input type="radio" name="normal_base" value="課外後2">
+            課外後2
+          </label>
+        </div>
+      </div>
+    
+      <!-- ===== 長期 預かり保育 ===== -->
+      <div id="care-long" style="display:none;">
+        <label>滞在時間</label>
+      
+        <!-- ラジオグループA -->
+        <label class="inline-label">
+          <input type="radio" name="long_base" value="ショート">
+          ショート（14時まで）
+        </label>
+        <label class="inline-label">
+          <input type="radio" name="long_base" value="ロング">
+          ロング（17時まで）
+        </label>
+      
+        <!-- 朝預（チェック） -->
+        <div style="margin-top:6px;">
+          <label class="inline-label">
+            <input type="checkbox" id="long_morning" value="朝預">
+            朝預
+          </label>
+        </div>
+      
+        <!-- 課外（ラジオグループB） -->
+        <div style="margin-top:6px;">
+          <label class="inline-label">
+            <input type="radio" name="long_extra" value="課外後1">
+            課外後1
+          </label>
+          <label class="inline-label">
+            <input type="radio" name="long_extra" value="課外後2">
+            課外後2
+          </label>
+        </div>
+      </div>
+  
     </div>
-  </div>
-
-<!-- ===== 長期 預かり保育 ===== -->
-<div id="care-long" style="display:none;">
-  <label>滞在時間</label>
-
-  <!-- ラジオグループA -->
-  <label class="inline-label">
-    <input type="radio" name="long_base" value="ショート">
-    ショート（14時まで）
-  </label>
-  <label class="inline-label">
-    <input type="radio" name="long_base" value="ロング">
-    ロング（17時まで）
-  </label>
-
-  <!-- 朝預（チェック） -->
-  <div style="margin-top:6px;">
-    <label class="inline-label">
-      <input type="checkbox" id="long_morning" value="朝預">
-      朝預
-    </label>
-  </div>
-
-  <!-- 課外（ラジオグループB） -->
-  <div style="margin-top:6px;">
-    <label class="inline-label">
-      <input type="radio" name="long_extra" value="課外後1">
-      課外後1
-    </label>
-    <label class="inline-label">
-      <input type="radio" name="long_extra" value="課外後2">
-      課外後2
-    </label>
-  </div>
-</div>
-
-
-</div>
-
 
     <div class="row" id="row-send">
       <label>送り時間</label>
