@@ -88,10 +88,12 @@ async function loadContactDetail() {
  ****************************************************/
 function applyEditRestrictions() {
   // ★ 園児選択の案内文を非表示
+  /*
   const label = document.getElementById("kidSelectLabel");
   if (label) label.style.display = "none";
   const kidArea = document.getElementById("kidArea");
   if (kidArea) kidArea.style.display = "none";  
+  */
   
   // 日付・園児は変更不可
   document
