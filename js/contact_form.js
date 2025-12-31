@@ -46,9 +46,9 @@ async function initPage() {
       const detail = await loadContactDetail();
       if (!detail) return;
 
-      restoreForm(detail);        // ← UI完全復元
-      setupAllergyUI();
       applyEditRestrictions();    // ← 日付・園児・預かり制御
+      setupAllergyUI();
+      restoreForm(detail);        // ← UI完全復元
 
       return; // ★★★ ここが最重要 ★★★
     }
