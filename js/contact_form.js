@@ -5,7 +5,10 @@ let calendarData = null;
 let contactType = null;
 let currentYearMonth = null;
 let isSubmitting = false;
-// ★ 編集用
+// ★ モード管理
+// new : 新規
+// view: 表示
+// edit: 編集
 let mode = "new";
 let contactId = null;
 /****************************************************
@@ -37,27 +40,29 @@ async function initPage() {
 
 
     /* =========================
-       ✏️ 編集モード
+       🆕 新規モード
        ========================= */
-    if (mode === "edit") {
-      document.getElementById("title").textContent =
-        `連絡内容の確認・変更 : ${contactType}連絡`;
-
-      const detail = await loadContactDetail();
-      if (!detail) return;
-
-      applyEditRestrictions();    // ← 日付・園児・預かり制御
+    if (mode === "new") {
+      if (!contactType) {
+        alert("連絡区分が指定されていません。");
+        return;
+      }
+      await loadKids();
       setupAllergyUI();
-      restoreForm(detail);        // ← UI完全復元
-
-      return; // ★★★ ここが最重要 ★★★
+      return;
     }
 
     /* =========================
-       🆕 新規モード
+       👁 表示／編集モード
        ========================= */
-    await loadKids();             // 新規のみ
-    setupAllergyUI();             // 新規のみ
+    const detail = await loadContactDetail();
+    if (!detail) return;
+
+    // 共通復元
+    restoreBase(detail);
+
+    // 表示モード初期
+    enterViewMode(detail);
 
   } catch (e) {
     console.error(e);
@@ -66,7 +71,7 @@ async function initPage() {
 }
 
 /****************************************************
- * 編集モード：連絡詳細取得
+ * 連絡詳細取得
  ****************************************************/
 async function loadContactDetail() {
   if (!contactId) return null;
@@ -84,58 +89,11 @@ async function loadContactDetail() {
   return res.contact; // ★ そのまま返す
 }
 /****************************************************
- * 編集制御（重要）
+ * 共通：基本情報復元（表示・編集共通）
  ****************************************************/
-function applyEditRestrictions() {
-  // ★ 園児選択の案内文を非表示
-  /*
-  const label = document.getElementById("kidSelectLabel");
-  if (label) label.style.display = "none";
-  const kidArea = document.getElementById("kidArea");
-  if (kidArea) kidArea.style.display = "none";  
-  */
-  
-  // 日付・園児は変更不可
-  document
-    .querySelectorAll("input[name=kid]")
-    .forEach(r => (r.disabled = true));
-
-  document.getElementById("selectedDateBox").classList.add("disabled");
-  const cancelArea = document.getElementById("cancelArea");
-  if (cancelArea) cancelArea.style.display = "block";
-  
-  // 預かり保育は「変更不可」
-  if (["預かり保育", "長期"].includes(contactType)) {
-    document.getElementById("btnSubmit").style.display = "none";
-  }
-
-  // 削除ボタン表示
-  const delBtn = document.getElementById("btnDelete");
-  const notice = document.getElementById("cancelLimitNotice");
-  
-  const isExpired =
-    selectedDate && !["預かり保育", "長期"].includes(contactType) && isAfterCancelLimit(selectedDate);
-
-  if (delBtn && !isExpired && !["預かり保育", "長期"].includes(contactType)) {
-    delBtn.style.display = "inline-block";
-    delBtn.onclick = onDeleteContact;
-  } else if (delBtn) {
-    delBtn.style.display = "none";
-  }
-
-  // ★ 補助テキスト表示
-  if (notice) {
-    notice.style.display = isExpired ? "block" : "none";
-  }
-}
-/****************************************************
- * 画面復元
- ****************************************************/
-function restoreForm(d) {
-  // ===== 連絡区分（変更不可だが判定用）=====
+function restoreBase(d) {
   contactType = d.contactType;
 
-  // ===== 園児（編集モードは API 値で固定）=====
   selectedKid = {
     kidsid: d.kids.kidsId,
     name: d.kids.name,
@@ -144,77 +102,221 @@ function restoreForm(d) {
     busUser: d.kids.busUser
   };
 
-  
-  // ===== 日付（変更不可）=====
   selectedDate = d.date.slice(0, 10);
-  updateFormByType();
+}
+/****************************************************
+ * 👁 表示モード
+ ****************************************************/
+function enterViewMode(d) {
+  mode = "view";
 
-  document.getElementById("selectedDateBox").textContent =
+  // 表示切替
+  document.getElementById("viewArea").style.display = "block";
+  document.getElementById("formBody").style.display = "none";
+  document.getElementById("kidArea").parentElement.style.display = "none";
+  document.getElementById("calendarArea").style.display = "none";
+
+  // 表示内容
+  document.getElementById("viewKid").textContent = selectedKid.name;
+  document.getElementById("viewDate").textContent =
     selectedDate.replace(/-/g, "/");
 
-  // ★ 日付選択不可
-  document.getElementById("selectedDateBox").classList.add("disabled");
+  document.getElementById("viewDetail").innerHTML =
+    buildViewDetail(d);
 
-  // ★ 編集モードでは即フォーム表示
+  /* =========================
+   * 編集ボタン
+   * ========================= */
+  document.getElementById("btnEdit").onclick = () => {
+    if (["預かり保育", "長期"].includes(contactType)) {
+      alert("この連絡は編集できません。キャンセルのみ可能です。");
+      return;
+    }
+    enterEditMode(d);
+  };
+
+  /* =========================
+   * 表示モード：キャンセルボタン制御
+   * ========================= */
+  const btnDeleteView = document.getElementById("btnDeleteView");
+
+  const isExpired = 
+    selectedDate &&
+    !["預かり保育", "長期"].includes(contactType) &&
+    isAfterCancelLimit(selectedDate);
+
+  if (btnDeleteView && !isExpired && !["預かり保育", "長期"].includes(contactType)) {
+    btnDeleteView.style.display = "inline-block";
+    btnDeleteView.onclick = onDeleteContact;
+  } else if (btnDeleteView) {
+    btnDeleteView.style.display = "none";
+  }
+}
+/****************************************************
+ * 表示内容生成
+ ****************************************************/
+function buildViewDetail(d) {
+  const lines = [];
+
+  if (d.reason) lines.push(`理由：${d.reason}`);
+  if (d.memo) lines.push(`備考：${d.memo}`);
+  if (d.sendTime) lines.push(`送り時間：${d.sendTime}`);
+  if (d.pickupTime) lines.push(`お迎え時間：${d.pickupTime}`);
+  if (d.guardian) lines.push(`来園者：${d.guardian}`);
+  if (d.guardianOther) lines.push(`（${d.guardianOther}）`);
+  if (d.baggage) lines.push(`荷物：${d.baggage}`);
+  if (d.lunch) lines.push(`給食：${d.lunch}`);
+  if (d.allergy) lines.push(`アレルギー：${d.allergy}`);
+  if (d.care) lines.push(`預かり内容：${d.care}`);
+
+  return lines.join("<br>");
+}
+/****************************************************
+ * ✏️ 編集モード
+ ****************************************************/
+function enterEditMode(d) {
+  mode = "edit";
+
+  document.getElementById("viewArea").style.display = "none";
   document.getElementById("formBody").style.display = "block";
-  
-  // ===== 理由 =====
+
+  // 園児・日付は固定表示
+  document.getElementById("kidArea").parentElement.style.display = "none";
+  document.getElementById("calendarArea").style.display = "none";
+
+  // フォーム復元
+  restoreFormDetail(d);
+  setupAllergyUI();
+  applyEditRestrictions();
+}
+/* *******************************
+ * 編集モード用：フォーム詳細復元
+ * 旧 restoreForm の責務をすべて包含
+ ******************************* */
+function restoreFormDetail(d) {
+  if (!d) return;
+
+  /* =========================
+   * ② フォーム構造切替（連絡種別）
+   * ========================= */
+  updateFormByType();
+
+  /* =========================
+   * ③ 日付表示（編集不可だが可視）
+   * ========================= */
+  if (selectedDate) {
+    const dateBox = document.getElementById("selectedDateBox");
+    if (dateBox) {
+      dateBox.textContent = selectedDate.replace(/-/g, "/");
+      dateBox.classList.add("disabled");
+    }
+  }
+
+  /* =========================
+   * ④ フォーム本体表示
+   * ========================= */
+  const body = document.getElementById("formBody");
+  if (body) body.style.display = "block";
+
+  /* =========================
+   * ⑤ 理由
+   * ========================= */
   if (d.reason) {
-    const r = document.querySelector(`input[name=reason][value="${d.reason}"]`);
+    const r = document.querySelector(
+      `input[name=reason][value="${d.reason}"]`
+    );
     if (r) r.checked = true;
   }
 
-  // ===== 備考 =====
-  if (d.memo) {
-    document.getElementById("memo").value = d.memo;
+  /* =========================
+   * ⑥ 備考
+   * ========================= */
+  if (typeof d.memo === "string") {
+    const memo = document.getElementById("memo");
+    if (memo) memo.value = d.memo;
   }
 
-  // ===== 荷物 =====
+  /* =========================
+   * ⑦ 荷物
+   * ========================= */
   if (d.baggage) {
-    const b = document.querySelector(`input[name=baggage][value="${d.baggage}"]`);
+    const b = document.querySelector(
+      `input[name=baggage][value="${d.baggage}"]`
+    );
     if (b) b.checked = true;
   }
 
-  // ===== 給食 =====
+  /* =========================
+   * ⑧ 給食
+   * ========================= */
   if (d.lunch) {
-    const l = document.querySelector(`input[name=lunch][value="${d.lunch}"]`);
+    const l = document.querySelector(
+      `input[name=lunch][value="${d.lunch}"]`
+    );
     if (l) l.checked = true;
   }
 
-  // ===== 送り時間 =====
+  /* =========================
+   * ⑨ 送り時間
+   * ========================= */
   if (d.sendTime) {
-    document.getElementById("send").value = d.sendTime;
+    const send = document.getElementById("send");
+    if (send) send.value = d.sendTime;
   }
 
-  // ===== お迎え時間 =====
+  /* =========================
+   * ⑩ お迎え時間
+   * ========================= */
   if (d.pickupTime) {
-    document.getElementById("pickup").value = d.pickupTime;
+    const pickup = document.getElementById("pickup");
+    if (pickup) pickup.value = d.pickupTime;
   }
 
-  // ===== 保護者 =====
+  /* =========================
+   * ⑪ 保護者
+   * ========================= */
   if (d.guardian) {
-    const g = document.querySelector(`input[name=guardian][value="${d.guardian}"]`);
+    const g = document.querySelector(
+      `input[name=guardian][value="${d.guardian}"]`
+    );
     if (g) g.checked = true;
   }
 
-  if (d.guardianOther) {
-    document.getElementById("guardianOther").value = d.guardianOther;
+  if (typeof d.guardianOther === "string") {
+    const other = document.getElementById("guardianOther");
+    if (other) other.value = d.guardianOther;
   }
 
-  // ===== アレルギー =====
+  /* =========================
+   * ⑫ アレルギー
+   * ========================= */
   if (d.allergy) {
-    document.querySelector(`input[name=allergy_flag][value="あり"]`).checked = true;
-    document.getElementById("allergy_options").style.display = "block";
+    const flag = document.querySelector(
+      `input[name=allergy_flag][value="あり"]`
+    );
+    if (flag) flag.checked = true;
+
+    const options = document.getElementById("allergy_options");
+    if (options) options.style.display = "block";
 
     d.allergy.split(" ").forEach(v => {
-      const a = document.querySelector(`input[name=allergy_item][value="${v}"]`);
+      const a = document.querySelector(
+        `input[name=allergy_item][value="${v}"]`
+      );
       if (a) a.checked = true;
     });
-  }  
+  }
+
+  /* =========================
+   * ⑬ 預かり保育／長期（お迎え時間再計算）
+   * ========================= */
+  if (["預かり保育", "長期"].includes(contactType)) {
+    updatePickupForCare();
+  }
 }
 
 /****************************************************
- * 削除処理
+ * 削除（表示・編集共通）
  ****************************************************/
 async function onDeleteContact() {
   if (!confirm("この連絡をキャンセルしますか？")) return;
@@ -234,6 +336,68 @@ async function onDeleteContact() {
   location.href = "contact_list.html";
 }
 
+/* ***********************************
+ * 編集モード時の制御
+ * 旧 applyEditRestrictions の完全互換＋表示モード前提整理
+ ********************************** */
+function applyEditRestrictions() {
+
+  /* =========================
+   * ① 園児・日付は変更不可
+   * ========================= */
+  document
+    .querySelectorAll("input[name=kid]")
+    .forEach(r => (r.disabled = true));
+
+  const dateBox = document.getElementById("selectedDateBox");
+  if (dateBox) {
+    dateBox.classList.add("disabled");
+  }
+
+  /* =========================
+   * ② キャンセル操作エリア表示
+   * ========================= */
+  const cancelArea = document.getElementById("cancelArea");
+  if (cancelArea) {
+    cancelArea.style.display = "block";
+  }
+
+  /* =========================
+   * ③ 預かり保育／長期は更新不可
+   * ========================= */
+  if (["預かり保育", "長期"].includes(contactType)) {
+    const submitBtn = document.getElementById("btnSubmit");
+    if (submitBtn) {
+      submitBtn.style.display = "none";
+    }
+  }
+
+  /* =========================
+   * ④ キャンセル期限判定
+   * ========================= */
+  const delBtn = document.getElementById("btnDelete");
+  const notice = document.getElementById("cancelLimitNotice");
+
+  const isExpired =
+    selectedDate &&
+    !["預かり保育", "長期"].includes(contactType) &&
+    isAfterCancelLimit(selectedDate);
+
+  /* --- キャンセルボタン制御 --- */
+  if (delBtn) {
+    if (!isExpired && !["預かり保育", "長期"].includes(contactType)) {
+      delBtn.style.display = "inline-block";
+      delBtn.onclick = onDeleteContact;
+    } else {
+      delBtn.style.display = "none";
+    }
+  }
+
+  /* --- 注意文表示 --- */
+  if (notice) {
+    notice.style.display = isExpired ? "block" : "none";
+  }
+}
 /****************************************************
  * 園児取得
  ****************************************************/
