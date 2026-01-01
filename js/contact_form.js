@@ -38,7 +38,11 @@ async function initPage() {
       // 表示
       document.getElementById("commonInfoArea").style.display = "block";
       document.getElementById("viewDetailArea").style.display = "block";
-  
+      const cancelArea = document.getElementById("cancelArea");
+      if (cancelArea) {
+        cancelArea.style.display = "block";
+      }
+      
     } else if (mode === "edit") {
       // 編集
       document.getElementById("commonInfoArea").style.display = "block";
