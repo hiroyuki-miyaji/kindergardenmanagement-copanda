@@ -61,11 +61,6 @@
       <div id="viewDetail" class="view-detail"></div>
     </div>
   
-    <div class="row btn-row">
-      <button id="btnEdit" class="menu-btn" type="button">編集</button>
-      <button id="btnBackView" class="menu-btn btn-back" type="button">戻る</button>
-    </div>
-  
   </div>
 
 
@@ -261,26 +256,21 @@
     </div>
     <!-- ★ キャンセル操作エリア（編集モード用） -->
     <div class="row" id="cancelArea" style="display:none;">
+   
+    </div>
     
+    <!-- ★ 共通アクションエリア（最下部） -->
+    <div id="actionArea" class="action-area">
       <!-- キャンセル期限切れメッセージ -->
       <p id="cancelLimitNotice" class="notice-text" style="display:none;">
         ※ キャンセル期限を過ぎています（当日 9:10 まで）
       </p>
-    
-      <!-- キャンセルボタン -->
-      <button id="btnDelete" class="menu-btn btn-cancel" type="button" style="display:none;">
-        連絡をキャンセル
-      </button>    
+      <button id="btnEdit" class="btn-outline">編集</button>
+      <button id="btnDeleteView" class="btn-outline">連絡をキャンセル</button>
+      <button id="btnBack" class="btn-outline">戻る</button>
+      <button id="btnSubmit" class="btn-primary">送信</button>
     </div>
     
-    <div class="row btn-row">
-      <button id="btnBack" class="menu-btn btn-back" type="button">
-        戻る
-      </button>
-      <button id="btnSubmit" class="menu-btn" type="button" >
-        送信
-      </button>
-    </div>
 
   </div>
 </div>
