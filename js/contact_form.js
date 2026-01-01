@@ -29,15 +29,18 @@ async function initPage() {
     
     // 表示エリアの制御：全部一旦消す
     hideAllAreas();
-  
+    // ★ ボタン初期化（全モード共通）
+    ["btnEdit","btnDeleteView","btnBack","btnSubmit","cancelLimitNotice"]
+      .forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = "none";
+      });
+    
     if (mode === "new") {
       // 新規
       document.getElementById("editInfoArea").style.display = "block";
   
     } else if (mode === "view") {
-      // 表示
-      document.getElementById("commonInfoArea").style.display = "block";
-      document.getElementById("viewDetailArea").style.display = "block";
       const cancelArea = document.getElementById("cancelArea");
       if (cancelArea) {
         cancelArea.style.display = "block";
@@ -75,6 +78,9 @@ async function initPage() {
         return;
       }
       await loadKids();
+      // ★ new：送信・戻るのみ
+      document.getElementById("btnSubmit").style.display = "inline-block";
+      document.getElementById("btnBack").style.display = "inline-block";     
       setupAllergyUI();
       return;
     }
@@ -173,18 +179,28 @@ function enterViewMode(d) {
     buildViewDetail(d);
 
   /* =========================
-   * 編集ボタン(預かり保育・長期は非表示)
+   * 表示モード：ボタン制御（確定）
    * ========================= */
-  const editBtn = document.getElementById("btnEdit");
+  const btnEdit = document.getElementById("btnEdit");
+  const btnDelete = document.getElementById("btnDeleteView");
+  const btnBack = document.getElementById("btnBack");
+  const btnSubmit = document.getElementById("btnSubmit");
+  const notice = document.getElementById("cancelLimitNotice");
   
-  if (["預かり保育", "長期"].includes(contactType)) {
-    // ★ 編集不可
-    editBtn.style.display = "none";
-  } else {
-    editBtn.style.display = "inline-block";
-    editBtn.onclick = () => {
-      enterEditMode(d);
-    };
+  // 送信は出さない
+  if (btnSubmit) btnSubmit.style.display = "none";
+  
+  // 戻るは表示
+  if (btnBack) btnBack.style.display = "inline-block";
+  
+  // 編集（預かり保育・長期は不可）
+  if (btnEdit) {
+    if (["預かり保育", "長期"].includes(contactType)) {
+      btnEdit.style.display = "none";
+    } else {
+      btnEdit.style.display = "inline-block";
+      btnEdit.onclick = () => enterEditMode(d);
+    }
   }
   
   /* =========================
@@ -197,13 +213,11 @@ function enterViewMode(d) {
   /* =========================
    * 表示モード：キャンセルボタン制御
    * ========================= */
-  const btnDeleteView = document.getElementById("cancelArea");
-  
-  if (btnDeleteView && canCancelContact()) {
-    btnDeleteView.style.display = "inline-block";
-    btnDeleteView.onclick = onDeleteContact;
-  } else if (btnDeleteView) {
-    btnDeleteView.style.display = "none";
+  if (btnDelete  && canCancelContact()) {
+    btnDelete.style.display = "inline-block";
+    btnDelete.onclick = onDeleteContact;
+  } else if (btnDelete) {
+    btnDelete.style.display = "none";
   }
 }
 /****************************************************
@@ -252,6 +266,43 @@ function enterEditMode(d) {
   restoreFormDetail(d);
   setupAllergyUI();
   applyEditRestrictions();
+  /* =========================
+   * 編集モード：ボタン制御
+   * ========================= */
+  const btnEdit = document.getElementById("btnEdit");
+  const btnDelete = document.getElementById("btnDeleteView");
+  const btnBack = document.getElementById("btnBack");
+  const btnSubmit = document.getElementById("btnSubmit");
+  const notice = document.getElementById("cancelLimitNotice");
+  
+  // 編集ボタンは不要
+  if (btnEdit) btnEdit.style.display = "none";
+  
+  // 戻るは表示
+  if (btnBack) btnBack.style.display = "inline-block";
+  
+  // 更新不可（預かり保育・長期）
+  if (["預かり保育", "長期"].includes(contactType)) {
+    if (btnSubmit) btnSubmit.style.display = "none";
+  } else {
+    if (btnSubmit) btnSubmit.style.display = "inline-block";
+  }
+  
+  // キャンセル
+  if (btnDelete && canCancelContact()) {
+    btnDelete.style.display = "inline-block";
+    btnDelete.onclick = onDeleteContact;
+  } else if (btnDelete) {
+    btnDelete.style.display = "none";
+  }
+  
+  // 期限切れ注意文
+  if (notice) {
+    notice.style.display =
+      selectedDate && isAfterCancelLimit(selectedDate)
+        ? "block"
+        : "none";
+  }
 }
 /* *******************************
  * 編集モード用：フォーム詳細復元
@@ -409,41 +460,16 @@ function applyEditRestrictions() {
   /* =========================
    * ② キャンセル操作エリア表示
    * ========================= */
+  // キャンセル操作エリア表示
   const cancelArea = document.getElementById("cancelArea");
-  if (cancelArea) {
-    cancelArea.style.display = "block";
-  }
+  if (cancelArea) cancelArea.style.display = "block";
 
-  /* =========================
-   * ③ 預かり保育／長期は更新不可
-   * ========================= */
+  // 預かり保育／長期は更新不可
   if (["預かり保育", "長期"].includes(contactType)) {
     const submitBtn = document.getElementById("btnSubmit");
-    if (submitBtn) {
-      submitBtn.style.display = "none";
-    }
+    if (submitBtn) submitBtn.style.display = "none";
   }
 
-  /* =========================
-   * ④ キャンセル期限判定
-   * ========================= */
-  const delBtn = document.getElementById("btnDelete");
-  const notice = document.getElementById("cancelLimitNotice");
-
-  const isExpired = selectedDate && isAfterCancelLimit(selectedDate);
-
-  /* --- キャンセルボタン制御 --- */
-  if (delBtn && canCancelContact()) {
-    delBtn.style.display = "inline-block";
-    delBtn.onclick = onDeleteContact;
-  } else if (delBtn) {
-    delBtn.style.display = "none";
-  }
-
-  /* --- 注意文表示 --- */
-  if (notice) {
-    notice.style.display = isExpired ? "block" : "none";
-  }
 }
 /****************************************************
  * 園児取得
