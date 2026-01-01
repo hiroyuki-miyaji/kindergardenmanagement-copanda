@@ -96,7 +96,9 @@ async function initPage() {
 
     // 表示モード初期
     enterViewMode(detail);
-
+    // ★ 追加（ここ）
+    updateActionButtons();
+    
   } catch (e) {
     console.error(e);
     alert("初期化に失敗しました");
@@ -169,6 +171,8 @@ function enterViewMode(d) {
    * 表示切替
    * ========================= */
   // ★ 園児・日付は触らない（常に表示）
+  const actionArea = document.getElementById("actionArea");
+  if (actionArea) actionArea.style.display = "block";
   document.getElementById("viewDetailArea").style.display = "block";
   document.getElementById("formBody").style.display = "none";
 
@@ -219,6 +223,7 @@ function enterViewMode(d) {
   } else if (btnDelete) {
     btnDelete.style.display = "none";
   }
+  updateActionButtons();
 }
 /****************************************************
  * キャンセルボタン表示の判定
@@ -227,6 +232,43 @@ function canCancelContact() {
   if (!selectedDate) return false;
   return !isAfterCancelLimit(selectedDate);
 }
+
+/****************************************************
+ * アクションボタン制御
+ ****************************************************/
+function updateActionButtons() {
+  const show = id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = "inline-block";
+  };
+  const hide = id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = "none";
+  };
+
+  // 全部隠す
+  ["btnEdit","btnDeleteView","btnSubmit"].forEach(hide);
+
+  // 共通
+  show("btnBack");
+
+  if (mode === "new") {
+    show("btnSubmit");
+  }
+
+  if (mode === "view") {
+    show("btnEdit");
+    if (canCancelContact()) show("btnDeleteView");
+  }
+
+  if (mode === "edit") {
+    if (!["預かり保育","長期"].includes(contactType)) {
+      show("btnSubmit");
+    }
+    if (canCancelContact()) show("btnDeleteView");
+  }
+}
+
 /****************************************************
  * 表示内容生成
  ****************************************************/
@@ -259,6 +301,8 @@ function buildViewDetail(d) {
 function enterEditMode(d) {
   mode = "edit";
 
+  const actionArea = document.getElementById("actionArea");
+  if (actionArea) actionArea.style.display = "block";
   document.getElementById("viewDetailArea").style.display = "none";
   document.getElementById("formBody").style.display = "block";
 
@@ -303,6 +347,7 @@ function enterEditMode(d) {
         ? "block"
         : "none";
   }
+  updateActionButtons();
 }
 /* *******************************
  * 編集モード用：フォーム詳細復元
