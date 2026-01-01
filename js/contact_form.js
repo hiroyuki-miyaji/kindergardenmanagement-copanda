@@ -131,16 +131,27 @@ function enterViewMode(d) {
     buildViewDetail(d);
 
   /* =========================
-   * 編集ボタン
+   * 編集ボタン(預かり保育・長期は非表示)
    * ========================= */
-  document.getElementById("btnEdit").onclick = () => {
-    if (["預かり保育", "長期"].includes(contactType)) {
-      alert("この連絡は編集できません。キャンセルのみ可能です。");
-      return;
-    }
-    enterEditMode(d);
+  const editBtn = document.getElementById("btnEdit");
+  
+  if (["預かり保育", "長期"].includes(contactType)) {
+    // ★ 編集不可
+    editBtn.style.display = "none";
+  } else {
+    editBtn.style.display = "inline-block";
+    editBtn.onclick = () => {
+      enterEditMode(d);
+    };
+  }
+  
+  /* =========================
+   * 戻る（一覧 or メニュー）
+   * ========================= */
+  document.getElementById("btnBackView").onclick = () => {
+    location.href = "contact_list.html"; // or index.html
   };
-
+  
   /* =========================
    * 表示モード：キャンセルボタン制御
    * ========================= */
