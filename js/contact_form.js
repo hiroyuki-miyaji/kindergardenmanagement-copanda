@@ -222,8 +222,8 @@ function buildViewDetail(d) {
   /* =========================
    * ★ 預かり保育／長期：区分表示
    * ========================= */
-  if (d.care) {
-    const careLines = d.care.split(" ").map(v => `・${v}`);
+  if (d.childcare) {
+    const careLines = d.childcare.split(" ").map(v => `・${v}`);
     lines.push(`預かり区分：<br>${careLines.join("<br>")}`);
   }
   
