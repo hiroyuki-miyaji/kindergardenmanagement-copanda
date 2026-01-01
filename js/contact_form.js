@@ -35,7 +35,7 @@ async function initPage() {
     //ヘッダー(連絡区分)を表示
     const typeEl = document.getElementById("viewContactType");
     if (typeEl && contactType) {
-      typeEl.textContent = contactType;
+      typeEl.textContent = contactType & "連絡";
     }
     
     if (!AUTH_CODE) {
