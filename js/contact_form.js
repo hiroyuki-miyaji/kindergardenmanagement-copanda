@@ -195,12 +195,9 @@ function enterViewMode(d) {
    * ========================= */
   const btnDeleteView = document.getElementById("btnDeleteView");
 
-  const isExpired = 
-    selectedDate &&
-    !["預かり保育", "長期"].includes(contactType) &&
-    isAfterCancelLimit(selectedDate);
+  const isExpired =  selectedDate && isAfterCancelLimit(selectedDate);
 
-  if (btnDeleteView && !isExpired && !["預かり保育", "長期"].includes(contactType)) {
+  if (btnDeleteView && !isExpired) {
     btnDeleteView.style.display = "inline-block";
     btnDeleteView.onclick = onDeleteContact;
   } else if (btnDeleteView) {
@@ -424,14 +421,11 @@ function applyEditRestrictions() {
   const delBtn = document.getElementById("btnDelete");
   const notice = document.getElementById("cancelLimitNotice");
 
-  const isExpired =
-    selectedDate &&
-    !["預かり保育", "長期"].includes(contactType) &&
-    isAfterCancelLimit(selectedDate);
+  const isExpired = selectedDate && isAfterCancelLimit(selectedDate);
 
   /* --- キャンセルボタン制御 --- */
   if (delBtn) {
-    if (!isExpired && !["預かり保育", "長期"].includes(contactType)) {
+    if (!isExpired) {
       delBtn.style.display = "inline-block";
       delBtn.onclick = onDeleteContact;
     } else {
