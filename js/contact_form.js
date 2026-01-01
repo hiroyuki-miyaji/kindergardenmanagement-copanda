@@ -109,6 +109,19 @@ function restoreBase(d) {
   };
 
   selectedDate = d.date.slice(0, 10);
+
+  /* =========================
+   * ★ 共通表示（ここで1回だけ）
+   * ========================= */
+  const kidEl = document.getElementById("viewKid");
+  if (kidEl) {
+    kidEl.textContent = selectedKid.name;
+  }
+
+  const dateEl = document.getElementById("viewDate");
+  if (dateEl) {
+    dateEl.textContent = selectedDate.replace(/-/g, "/");
+  }
 }
 /****************************************************
  * 👁 表示モード
