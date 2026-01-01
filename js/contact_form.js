@@ -187,7 +187,7 @@ function enterViewMode(d) {
    * 戻る（一覧 or メニュー）
    * ========================= */
   document.getElementById("btnBackView").onclick = () => {
-    location.href = "contact_list.html"; // or index.html
+    location.href = "index.html"; // or index.html
   };
   
   /* =========================
