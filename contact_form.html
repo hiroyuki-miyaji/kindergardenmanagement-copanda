@@ -38,7 +38,8 @@
   <!-- =========================
      ★ 表示モード（新設）
      ========================= -->
-  <div id="viewArea" class="form-section" style="display:none;">
+  <!-- ★ 共通ヘッダー情報（常に表示） -->
+  <div id="commonInfoArea" class="form-section">
   
     <div class="row">
       <label>園児</label>
@@ -50,6 +51,11 @@
       <span id="viewDate" class="view-text"></span>
     </div>
   
+  </div>
+  
+  <!-- ★ 表示モード専用 -->
+  <div id="viewDetailArea" class="form-section" style="display:none;">
+  
     <div class="row">
       <label>連絡内容</label>
       <div id="viewDetail" class="view-detail"></div>
@@ -59,7 +65,9 @@
       <button id="btnEdit" class="menu-btn" type="button">編集</button>
       <button id="btnBackView" class="menu-btn btn-back" type="button">戻る</button>
     </div>
+  
   </div>
+
 
   <!-- ① 園児選択 -->
   <div class="form-section">
