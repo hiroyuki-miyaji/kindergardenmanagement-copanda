@@ -142,11 +142,17 @@ body {
 .contact-item:hover {
   background: #f5f5f5;
 }
+/* 今後の連絡一覧 */
+#contactList li {
+  white-space: nowrap;   /* ← 改行禁止 */
+}
 .contact-link {
   display: block;
   padding: 6px 4px;
   color: #1a73e8;
   text-decoration: underline;
+  white-space: nowrap;
+  display: inline;       /* block になっていたら戻す */
 }
 
 .contact-link:hover {
