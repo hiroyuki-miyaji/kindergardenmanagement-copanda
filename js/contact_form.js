@@ -206,7 +206,7 @@ function enterViewMode(d) {
   /* =========================
    * 戻る（一覧 or メニュー）
    * ========================= */
-  document.getElementById("btnBackView").onclick = () => {
+  document.getElementById("btnBack").onclick = () => {
     location.href = "index.html"; // or index.html
   };
   
