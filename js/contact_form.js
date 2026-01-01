@@ -116,17 +116,20 @@ function restoreBase(d) {
 function enterViewMode(d) {
   mode = "view";
 
-  // 表示切替
-  document.getElementById("viewArea").style.display = "block";
+  /* =========================
+   * 表示切替
+   * ========================= */
+  // ★ 園児・日付は触らない（常に表示）
+  document.getElementById("viewDetailArea").style.display = "block";
   document.getElementById("formBody").style.display = "none";
-  document.getElementById("kidArea").parentElement.style.display = "none";
-  document.getElementById("calendarArea").style.display = "none";
 
-  // 表示内容
-  document.getElementById("viewKid").textContent = selectedKid.name;
-  document.getElementById("viewDate").textContent =
-    selectedDate.replace(/-/g, "/");
+  // ★ 新規用UIは非表示
+  document.getElementById("kidArea")?.parentElement?.classList.add("hidden");
+  document.getElementById("calendarArea")?.classList.add("hidden");
 
+  /* =========================
+   * 表示内容（詳細のみ）
+   * ========================= */
   document.getElementById("viewDetail").innerHTML =
     buildViewDetail(d);
 
@@ -194,12 +197,8 @@ function buildViewDetail(d) {
 function enterEditMode(d) {
   mode = "edit";
 
-  document.getElementById("viewArea").style.display = "none";
+  document.getElementById("viewDetailArea").style.display = "none";
   document.getElementById("formBody").style.display = "block";
-
-  // 園児・日付は固定表示
-  document.getElementById("kidArea").parentElement.style.display = "none";
-  document.getElementById("calendarArea").style.display = "none";
 
   // フォーム復元
   restoreFormDetail(d);
