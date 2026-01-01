@@ -31,7 +31,13 @@ async function initPage() {
       alert("連絡区分が指定されていません。");
       return;
     }
-
+    
+    //ヘッダー(連絡区分)を表示
+    const typeEl = document.getElementById("viewContactType");
+    if (typeEl && contactType) {
+      typeEl.textContent = contactType;
+    }
+    
     if (!AUTH_CODE) {
       alert("認証情報がありません。LINEから再度アクセスしてください。");
       location.href = "index.html";
