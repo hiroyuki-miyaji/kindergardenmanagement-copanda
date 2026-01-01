@@ -219,7 +219,14 @@ function buildViewDetail(d) {
   if (d.guardianOther) lines.push(`（${d.guardianOther}）`);
   if (d.baggage) lines.push(`荷物：${d.baggage}`);
   if (d.lunch) lines.push(`給食：${d.lunch}`);
-  if (d.care) lines.push(`預かり内容：${d.care}`);
+  /* =========================
+   * ★ 預かり保育／長期：区分表示
+   * ========================= */
+  if (d.care) {
+    const careLines = d.care.split(" ").map(v => `・${v}`);
+    lines.push(`預かり区分：<br>${careLines.join("<br>")}`);
+  }
+  
   if (d.allergy) lines.push(`アレルギー：${d.allergy}`);
   if (d.reason) lines.push(`理由：${d.reason}`);
   if (d.memo) lines.push(`備考：${d.memo}`);
