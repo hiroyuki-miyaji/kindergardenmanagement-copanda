@@ -197,7 +197,7 @@ function enterViewMode(d) {
   /* =========================
    * 表示モード：キャンセルボタン制御
    * ========================= */
-  const btnDeleteView = document.getElementById("btnDeleteView");
+  const btnDeleteView = document.getElementById("cancelArea");
   
   if (btnDeleteView && canCancelContact()) {
     btnDeleteView.style.display = "inline-block";
