@@ -27,6 +27,25 @@ async function initPage() {
     mode = params.get("mode") || "new";
     contactId = params.get("contactId");
     
+    // 表示エリアの制御：全部一旦消す
+    hideAllAreas();
+  
+    if (mode === "new") {
+      // 新規
+      document.getElementById("editInfoArea").style.display = "block";
+      document.getElementById("formBody").style.display = "block";
+  
+    } else if (mode === "view") {
+      // 表示
+      document.getElementById("commonInfoArea").style.display = "block";
+      document.getElementById("viewDetailArea").style.display = "block";
+  
+    } else if (mode === "edit") {
+      // 編集
+      document.getElementById("commonInfoArea").style.display = "block";
+      document.getElementById("formBody").style.display = "block";
+    }
+    
     if (!contactType && mode === "new") {
       alert("連絡区分が指定されていません。");
       return;
@@ -75,7 +94,16 @@ async function initPage() {
     alert("初期化に失敗しました");
   }
 }
-
+/****************************************************
+ * 非表示制御関数
+ ****************************************************/
+function hideAllAreas() {
+  ["commonInfoArea", "editInfoArea", "viewDetailArea", "formBody"]
+    .forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.style.display = "none";
+    });
+}
 /****************************************************
  * 連絡詳細取得
  ****************************************************/
@@ -135,10 +163,6 @@ function enterViewMode(d) {
   // ★ 園児・日付は触らない（常に表示）
   document.getElementById("viewDetailArea").style.display = "block";
   document.getElementById("formBody").style.display = "none";
-
-  // ★ 新規用UIは非表示
-  document.getElementById("kidArea")?.parentElement?.classList.add("hidden");
-  document.getElementById("calendarArea")?.classList.add("hidden");
 
   /* =========================
    * 表示内容（詳細のみ）
@@ -370,18 +394,6 @@ async function onDeleteContact() {
  * 旧 applyEditRestrictions の完全互換＋表示モード前提整理
  ********************************** */
 function applyEditRestrictions() {
-
-  /* =========================
-   * ① 園児・日付は変更不可
-   * ========================= */
-  document
-    .querySelectorAll("input[name=kid]")
-    .forEach(r => (r.disabled = true));
-
-  const dateBox = document.getElementById("selectedDateBox");
-  if (dateBox) {
-    dateBox.classList.add("disabled");
-  }
 
   /* =========================
    * ② キャンセル操作エリア表示
