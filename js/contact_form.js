@@ -391,7 +391,7 @@ async function onDeleteContact() {
   }
 
   alert("キャンセルしました");
-  location.href = "contact_list.html";
+  location.href = "index.html";
 }
 
 /* ***********************************
