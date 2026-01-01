@@ -158,16 +158,16 @@ function enterViewMode(d) {
 function buildViewDetail(d) {
   const lines = [];
 
-  if (d.reason) lines.push(`理由：${d.reason}`);
-  if (d.memo) lines.push(`備考：${d.memo}`);
   if (d.sendTime) lines.push(`送り時間：${d.sendTime}`);
   if (d.pickupTime) lines.push(`お迎え時間：${d.pickupTime}`);
   if (d.guardian) lines.push(`来園者：${d.guardian}`);
   if (d.guardianOther) lines.push(`（${d.guardianOther}）`);
   if (d.baggage) lines.push(`荷物：${d.baggage}`);
   if (d.lunch) lines.push(`給食：${d.lunch}`);
-  if (d.allergy) lines.push(`アレルギー：${d.allergy}`);
   if (d.care) lines.push(`預かり内容：${d.care}`);
+  if (d.allergy) lines.push(`アレルギー：${d.allergy}`);
+  if (d.reason) lines.push(`理由：${d.reason}`);
+  if (d.memo) lines.push(`備考：${d.memo}`);
 
   return lines.join("<br>");
 }
