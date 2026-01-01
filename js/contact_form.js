@@ -198,15 +198,20 @@ function enterViewMode(d) {
    * 表示モード：キャンセルボタン制御
    * ========================= */
   const btnDeleteView = document.getElementById("btnDeleteView");
-
-  const isExpired =  selectedDate && isAfterCancelLimit(selectedDate);
-
-  if (btnDeleteView && !isExpired) {
+  
+  if (btnDeleteView && canCancelContact()) {
     btnDeleteView.style.display = "inline-block";
     btnDeleteView.onclick = onDeleteContact;
   } else if (btnDeleteView) {
     btnDeleteView.style.display = "none";
   }
+}
+/****************************************************
+ * キャンセルボタン表示の判定
+ ****************************************************/
+function canCancelContact() {
+  if (!selectedDate) return false;
+  return !isAfterCancelLimit(selectedDate);
 }
 /****************************************************
  * 表示内容生成
@@ -428,13 +433,11 @@ function applyEditRestrictions() {
   const isExpired = selectedDate && isAfterCancelLimit(selectedDate);
 
   /* --- キャンセルボタン制御 --- */
-  if (delBtn) {
-    if (!isExpired) {
-      delBtn.style.display = "inline-block";
-      delBtn.onclick = onDeleteContact;
-    } else {
-      delBtn.style.display = "none";
-    }
+  if (delBtn && canCancelContact()) {
+    delBtn.style.display = "inline-block";
+    delBtn.onclick = onDeleteContact;
+  } else if (delBtn) {
+    delBtn.style.display = "none";
   }
 
   /* --- 注意文表示 --- */
