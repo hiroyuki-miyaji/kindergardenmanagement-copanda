@@ -33,7 +33,6 @@ async function initPage() {
     if (mode === "new") {
       // 新規
       document.getElementById("editInfoArea").style.display = "block";
-      document.getElementById("formBody").style.display = "block";
   
     } else if (mode === "view") {
       // 表示
@@ -43,7 +42,6 @@ async function initPage() {
     } else if (mode === "edit") {
       // 編集
       document.getElementById("commonInfoArea").style.display = "block";
-      document.getElementById("formBody").style.display = "block";
     }
     
     if (!contactType && mode === "new") {
