@@ -60,6 +60,8 @@
       <label>連絡内容</label>
       <div id="viewDetail" class="view-detail"></div>
     </div>
+
+    <button id="btnEdit" class="btn-outline">編集</button>
   
   </div>
 
@@ -96,6 +98,7 @@
         <div id="calendarGrid" class="calendar-grid"></div>
       </div>
     </div>
+    
   </div>
 
   <!-- ③ フォーム本体 -->
@@ -260,19 +263,17 @@
     </div>
     
     <!-- ★ 共通アクションエリア（最下部） -->
-    <div id="actionArea" class="action-area">
+    <div id="actionArea" class="row">
       <!-- キャンセル期限切れメッセージ -->
       <p id="cancelLimitNotice" class="notice-text" style="display:none;">
         ※ キャンセル期限を過ぎています（当日 9:10 まで）
       </p>
-      <button id="btnEdit" class="btn-outline">編集</button>
       <button id="btnDeleteView" class="btn-outline">連絡をキャンセル</button>
-      <button id="btnBack" class="btn-outline">戻る</button>
       <button id="btnSubmit" class="btn-primary">送信</button>
     </div>
-    
 
   </div>
+  <button id="btnBack" class="btn-outline">戻る</button>
 </div>
 </body>
 </html>
