@@ -152,7 +152,7 @@ body {
 ================================ */
 #contactList li {
   list-style: none;
-  margin-bottom: 6px;
+  margin-bottom: 0px;
 }
 
 .contact-row {
