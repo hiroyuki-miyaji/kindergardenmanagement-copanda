@@ -257,19 +257,19 @@
       <label class="inline-label"><input type="radio" name="guardian" value="その他">その他</label>
       <input id="guardianOther" type="text" placeholder="その他の場合入力">
     </div>
-    <!-- ★ キャンセル操作エリア（編集モード用） -->
-    <div class="row" id="cancelArea">
-   
-    </div>
-    
+
     <!-- ★ 共通アクションエリア（最下部） -->
     <div id="actionArea" class="row">
+      <button id="btnSubmit" class="btn-primary">送信</button>
+    </div>
+    
+    <!-- ★ キャンセル操作エリア（編集モード用） -->
+    <div class="row" id="cancelArea">
       <!-- キャンセル期限切れメッセージ -->
       <p id="cancelLimitNotice" class="notice-text" style="display:none;">
         ※ キャンセル期限を過ぎています（当日 9:10 まで）
       </p>
       <button id="btnDeleteView" class="btn-outline">連絡をキャンセル</button>
-      <button id="btnSubmit" class="btn-primary">送信</button>
     </div>
 
   </div>
