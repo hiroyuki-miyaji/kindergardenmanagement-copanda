@@ -171,7 +171,10 @@ function enterViewMode(d) {
   // ★ 園児・日付は触らない（常に表示）
   const actionArea = document.getElementById("actionArea");
   if (actionArea) actionArea.style.display = "block";
+  document.getElementById("commonInfoArea").style.display = "block";
   document.getElementById("viewDetailArea").style.display = "block";
+  // ===== 編集エリアは出さない =====
+  document.getElementById("editInfoArea").style.display = "none";
   document.getElementById("formBody").style.display = "none";
 
   /* =========================
