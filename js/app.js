@@ -148,18 +148,22 @@ async function loadUpcomingContacts() {
 
     res.items.forEach(c => {
       const li = document.createElement("li");
+      li.className = "contact-item";
     
-      li.innerHTML = `
-        <a
-          href="contact_form.html?mode=edit&contactId=${encodeURIComponent(c.contactId)}&type=${encodeURIComponent(c.type)}"
-          class="contact-row"
-        >
-          <span class="contact-text">${c.date} ${c.name ?? ""}</span>
-          <span class="contact-type">${c.type}</span>
-        </a>
-      `;
-
+      const a = document.createElement("a");
+      a.className = "contact-row";
+      a.href = `contact_form.html?mode=edit&contactId=${encodeURIComponent(c.contactId)}&type=${encodeURIComponent(c.type)}`;
     
+      const text = document.createElement("span");
+      text.className = "contact-text";
+      text.textContent = `${c.date} ${c.name ?? ""}`;
+    
+      const type = document.createElement("span");
+      type.className = "contact-type";
+      type.textContent = c.type;
+    
+      a.append(text, type);
+      li.appendChild(a);
       ul.appendChild(li);
     });
 
