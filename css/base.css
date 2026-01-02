@@ -161,8 +161,8 @@ body {
   gap: 12px;
 
   width: 100%;
-  min-height: 48px;
-  padding: 12px 14px;
+  min-height: 40px;
+  padding: 6px 12px;
 
   box-sizing: border-box;
   border-radius: 8px;
@@ -190,6 +190,7 @@ body {
   flex: 1;
   overflow: hidden;
   text-overflow: ellipsis;
+  color: #333;
 }
 
 .contact-type {
