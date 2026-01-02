@@ -261,6 +261,7 @@ function buildViewDetail(d) {
     if (busLines.length) {
       lines.push(`園バス：<br>${busLines.map(v => `・${v}`).join("<br>")}`);
     }
+  }
     /* =========================
    * ★ 預かり保育／長期：区分表示
    * ========================= */
