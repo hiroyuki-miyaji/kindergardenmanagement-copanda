@@ -146,16 +146,13 @@ body {
     max-width: 420px;
   }
 }
-.contact-item:hover {
-  background: #f5f5f5;
-}
 
 /* ================================
    連絡一覧（スマホ誤タップ防止）
 ================================ */
 #contactList li {
   list-style: none;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 
 .contact-row {
@@ -163,20 +160,34 @@ body {
   align-items: center;
   gap: 12px;
 
-  padding: 12px 10px;     /* ← タップ領域 */
-  border-radius: 6px;
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 14px;
+
+  box-sizing: border-box;
+  border-radius: 8px;
 
   text-decoration: none;
   color: #1a73e8;
 
-  white-space: nowrap;    /* 1行固定 */
+  white-space: nowrap;
 }
 
 .contact-row:hover {
   background: #f5f5f5;
 }
 
+.contact-row:active {
+  background: #eaeaea;
+}
+
+.contact-row:focus-visible {
+  outline: 2px solid #c93056;
+  outline-offset: 2px;
+}
+
 .contact-text {
+  flex: 1;
   overflow: hidden;
   text-overflow: ellipsis;
 }
