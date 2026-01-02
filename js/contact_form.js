@@ -246,6 +246,22 @@ function buildViewDetail(d) {
   if (d.baggage) lines.push(`荷物：${d.baggage}`);
   if (d.lunch) lines.push(`給食：${d.lunch}`);
   /* =========================
+   * ★ 園バス
+   * ========================= */
+  if (d.contactType === "園バス") {
+    const busLines = [];
+
+    if (d.busMorning === "乗らない") {
+      busLines.push("朝バス：乗らない");
+    }
+    if (d.busEvening === "乗らない") {
+      busLines.push("帰りバス：乗らない");
+    }
+
+    if (busLines.length) {
+      lines.push(`園バス：<br>${busLines.map(v => `・${v}`).join("<br>")}`);
+    }
+    /* =========================
    * ★ 預かり保育／長期：区分表示
    * ========================= */
   if (d.childcare) {
@@ -408,6 +424,22 @@ function restoreFormDetail(d) {
   if (typeof d.guardianOther === "string") {
     const other = document.getElementById("guardianOther");
     if (other) other.value = d.guardianOther;
+  }
+  /* =========================
+   * ⑪-2 園バス
+   * ========================= */
+  if (contactType === "園バス") {
+  
+    const morning = document.getElementById("bus_morning");
+    const evening = document.getElementById("bus_evening");
+  
+    if (morning) {
+      morning.checked = (d.busMorning === "乗らない");
+    }
+  
+    if (evening) {
+      evening.checked = (d.busEvening === "乗らない");
+    }
   }
 
   /* =========================
