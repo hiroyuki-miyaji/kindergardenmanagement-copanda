@@ -152,13 +152,13 @@ body {
 ================================ */
 #contactList li {
   list-style: none;
-  margin-bottom: 10px;
+  margin-bottom: 6px;
 }
 
 .contact-row {
   display: flex;
   align-items: left;
-  gap: 12px;
+  gap: 6px;
 
   width: 100%;
   min-height: 40px;
