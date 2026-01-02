@@ -1046,7 +1046,8 @@ function buildUpdatePayload() {
     authCode: AUTH_CODE,
     contactId,               // ★必須
     contactType              // ★判定用（変更不可だが送る）
-  };
+    busUser: selectedKid?.busUser ?? null  // ★ 追加
+};
 
   // ===== 理由・備考 =====
   payload.reason =
