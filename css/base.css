@@ -157,8 +157,8 @@ body {
 
 .contact-row {
   display: flex;
-  align-items: left;
-  gap: 6px;
+  align-items: center;
+  gap: 0px;
 
   width: 100%;
   min-height: 40px;
