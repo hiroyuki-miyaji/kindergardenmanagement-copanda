@@ -138,10 +138,6 @@ body {
     margin-top: 16px;
   }
 
-  .contact-link {
-    display: block;
-    padding: 14px 10px;
-  }
 }
 
 /* PC */
@@ -188,22 +184,6 @@ body {
 .contact-type {
   flex-shrink: 0;
   font-weight: bold;
-}
-
-/* 連絡リンク（スマホ対応） */
-.contact-link {
-  display: block;                 /* ★ inline → block */
-  padding: 12px 8px;              /* ★ タップ領域拡張 */
-  line-height: 1.4;
-  color: #1a73e8;
-  text-decoration: underline;
-  border-radius: 6px;
-}
-
-/* タップ時の視認性 */
-.contact-link:hover,
-.contact-link:active {
-  background: #f5f5f5;
 }
 
 /* ================================
