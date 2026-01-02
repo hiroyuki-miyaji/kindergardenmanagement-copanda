@@ -44,42 +44,6 @@ body {
 /* ================================
    メニュー共通ボタン
 ================================ */
-/* ================================
-   共通ボタン（フォーム用）
-================================ */
-button {
-  font-size: 16px;
-  padding: 14px 16px;
-  border-radius: 8px;
-  cursor: pointer;
-  box-sizing: border-box;
-}
-
-/* メイン（送信） */
-.btn-primary {
-  background: #c93056;
-  color: #fff;
-  border: none;
-  width: 100%;
-}
-
-.btn-primary:disabled {
-  background: #ccc;
-  color: #888;
-}
-
-/* 補助（戻る・編集・キャンセル） */
-.btn-outline {
-  background: #fff;
-  color: #c93056;
-  border: 1px solid #c93056;
-  width: 100%;
-}
-
-.btn-outline:hover {
-  background: #fbe9ee;
-}
-
 .menu-btn {
   display: block;
   width: 100%;
