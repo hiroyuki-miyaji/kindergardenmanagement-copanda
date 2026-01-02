@@ -149,7 +149,16 @@ async function loadUpcomingContacts() {
     res.items.forEach(c => {
       const li = document.createElement("li");
     
-      li.innerHTML = `${c.date} ${c.name ?? ""}    <a href="contact_form.html?mode=edit&contactId=${encodeURIComponent(c.contactId)}&type=${encodeURIComponent(c.type)}" class="contact-link">${c.type}</a>`;
+      li.innerHTML = `
+        <a
+          href="contact_form.html?mode=edit&contactId=${encodeURIComponent(c.contactId)}&type=${encodeURIComponent(c.type)}"
+          class="contact-row"
+        >
+          <span class="contact-text">${c.date} ${c.name ?? ""}</span>
+          <span class="contact-type">${c.type}</span>
+        </a>
+      `;
+
     
       ul.appendChild(li);
     });
