@@ -583,7 +583,7 @@ document.getElementById("selectedDateBox")?.addEventListener("click", () => {
 /****************************************************
  * カレンダー描画（月切替・正規カレンダー）
  ****************************************************/
-function renderCalendarGrid({ calendar, lunchDates }) {
+function renderCalendarGrid({ calendar, lunchDates, morningDates }) {
   const grid = document.getElementById("calendarGrid");
   const title = document.getElementById("calendarTitle");
   grid.innerHTML = "";
@@ -650,7 +650,11 @@ function renderCalendarGrid({ calendar, lunchDates }) {
         if ((lunchDates ?? []).includes(dateStr)) {
           cell.classList.add("lunch");
         }
-
+        
+        if ((morningDates ?? []).includes(dateStr)) {
+          cell.classList.add("morning");
+        }
+        
         cell.onclick = async (e) => {
         await onDateSelected(dateStr, e.currentTarget);
         };
