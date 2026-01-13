@@ -124,6 +124,10 @@
   background: #fff3b0;
 }
 
+.cal-day.morning {
+  background: #309c46;
+}
+
 .cal-day.selected {
   background: #c93056;
   color: white;
