@@ -600,28 +600,45 @@ function renderCalendarGrid({ calendar, lunchDates, morningDates }) {
 
   draw();
 
-  function draw() {
+function draw() {
     grid.innerHTML = "";
-
     title.textContent = currentYearMonth.replace("-", "年") + "月";
 
-    document.getElementById("prevMonth").onclick = () => {
-      const i = months.indexOf(currentYearMonth);
-      if (i > 0) {
-        currentYearMonth = months[i - 1];
+    // ★修正①：月めくりボタンの活性・非活性制御
+    const currentIndex = months.indexOf(currentYearMonth);
+    const prevBtn = document.getElementById("prevMonth");
+    const nextBtn = document.getElementById("nextMonth");
+  
+    // 前月ボタン
+    if (currentIndex <= 0) {
+      prevBtn.disabled = true;
+      prevBtn.style.opacity = "0.3"; // 押せないことを視覚的に示す
+      prevBtn.onclick = null;
+    } else {
+      prevBtn.disabled = false;
+      prevBtn.style.opacity = "1.0";
+      prevBtn.onclick = () => {
+        currentYearMonth = months[currentIndex - 1];
         draw();
-      }
-    };
+      };
+    }
 
-    document.getElementById("nextMonth").onclick = () => {
-      const i = months.indexOf(currentYearMonth);
-      if (i < months.length - 1) {
-        currentYearMonth = months[i + 1];
+    // 次月ボタン
+    if (currentIndex >= months.length - 1) {
+      nextBtn.disabled = true;
+      nextBtn.style.opacity = "0.3";
+      nextBtn.onclick = null;
+    } else {
+      nextBtn.disabled = false;
+      nextBtn.style.opacity = "1.0";
+      nextBtn.onclick = () => {
+        currentYearMonth = months[currentIndex + 1];
         draw();
-      }
-    };
+      };
+    }
+    // ----------------------------------------------
 
-    // 曜日
+    // 曜日ヘッダーの描画
     ["日","月","火","水","木","金","土"].forEach(w =>
       grid.insertAdjacentHTML("beforeend", `<div class="cal-head">${w}</div>`)
     );
@@ -635,7 +652,7 @@ function renderCalendarGrid({ calendar, lunchDates, morningDates }) {
       grid.insertAdjacentHTML("beforeend", `<div class="cal-day empty"></div>`);
     }
 
-    // 日付
+    // 日付の描画
     for (let d = 1; d <= lastDate.getDate(); d++) {
       const dateStr = `${currentYearMonth}-${String(d).padStart(2,"0")}`;
       const cell = document.createElement("div");
@@ -647,19 +664,13 @@ function renderCalendarGrid({ calendar, lunchDates, morningDates }) {
         cell.className = "cal-day selectable";
         cell.textContent = d;
 
-        if ((lunchDates ?? []).includes(dateStr)) {
-          cell.classList.add("lunch");
-        }
-        
-        if ((morningDates ?? []).includes(dateStr)) {
-          cell.classList.add("morning");
-        }
+        if ((lunchDates ?? []).includes(dateStr)) cell.classList.add("lunch");
+        if ((morningDates ?? []).includes(dateStr)) cell.classList.add("morning");
         
         cell.onclick = async (e) => {
-        await onDateSelected(dateStr, e.currentTarget);
+          await onDateSelected(dateStr, e.currentTarget);
         };
       }
-
       grid.appendChild(cell);
     }
   }
@@ -864,7 +875,7 @@ function showChildcareSummary(detail) {
   if (detail.afternoon) {
     const remain = detail.afternoon.limit - detail.afternoon.reserved;
     lines.push(
-      `午後：残り ${detail.afternoon.limit - detail.afternoon.reserved} 名 (定員 ${detail.morning.limit} 名)`
+      `午後：残り ${detail.afternoon.limit - detail.afternoon.reserved} 名 (定員 ${detail.afternoon.limit} 名)`
     );
     if (remain <= 0) isFull = true;
   }
@@ -907,6 +918,42 @@ async function onSubmitContact() {
       return;
     }
 
+    //テスト不具合対応
+    // 指摘②: 欠席時の荷物チェック
+    if (contactType === "欠席") {
+        if (!document.querySelector("input[name=baggage]:checked")) {
+            alert("荷物持ち帰りについて選択してください");
+            return;
+        }
+    }
+
+    // 指摘④, ⑥: 給食日の給食有無チェック
+    const isLunchDay = (calendarData?.lunchDates ?? []).includes(selectedDate);
+    if (isLunchDay && ["遅刻", "早退", "欠席"].includes(contactType)) {
+        if (!document.querySelector("input[name=lunch]:checked")) {
+            alert("給食の有無を選択してください");
+            return;
+        }
+    }
+
+    // 指摘⑤, ⑨: 保護者選択チェック
+    if (["早退", "園バス"].includes(contactType)) {
+        if (!document.querySelector("input[name=guardian]:checked")) {
+            alert("来園する保護者を選択してください");
+            return;
+        }
+    }
+
+    // 指摘⑧: バス選択チェック
+    if (contactType === "園バス") {
+        const morning = document.getElementById("bus_morning").checked;
+        const evening = document.getElementById("bus_evening").checked;
+        if (!morning && !evening) {
+            alert("キャンセルするバス（朝・帰り）を少なくとも1つ選択してください");
+            return;
+        }
+    }
+    
     if (isSubmitting) return; // ★ 二重送信防止
     isSubmitting = true;
 
@@ -1133,7 +1180,7 @@ function buildUpdatePayload() {
  ****************************************************/
 document.getElementById("btnBack")?.addEventListener("click", () => {
   // メニューへ
-  location.href = "index.html";
+  window.location.replace("index.html");
 });
 /****************************************************
  * 預かり内容生成（追加）
@@ -1170,6 +1217,7 @@ function getCareValue() {
       alert("ショート／ロングを選択してください");
       return null;
     }
+    v.push(base);
 
     const longmorning = document.getElementById("long_morning");
     if (longmorning?.checked && longmorning.value) {
@@ -1303,7 +1351,7 @@ function isAfterCancelLimit(dateStr) {
 }
 // ===== その他 =====
 function setSendTimes() {
-  setTimes("send", ["9:30","10:00","10:30","11:00","11:30"]);
+  setTimes("send", ["9:30","10:00","10:30","11:00","11:30","12:00"]);
 }
 function setPickupTimesForLeave() {
   setTimes("pickup", PICKUP_TIME.DEFAULT);
