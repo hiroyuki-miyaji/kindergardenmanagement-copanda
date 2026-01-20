@@ -750,6 +750,16 @@ function updateFormByType() {
     show("row-baggage");
     if ((calendarData?.lunchDates ?? []).includes(selectedDate)) {
       show("row-lunch");
+      const lunchRadios = document.querySelectorAll("input[name=lunch]");
+      const lunchNo = document.querySelector("input[name=lunch][value='不要']");
+      
+      // ★ 追加：給食ありの日の欠席はデフォルト「不要」かつ「非活性」
+      if (lunchNo) {
+        lunchNo.checked = true;
+      }
+      lunchRadios.forEach(r => {
+        r.disabled = true; // ラジオボタンを操作不能にする
+      });
     }
   }
 
