@@ -337,28 +337,6 @@ function restoreFormDetail(d) {
   if (!d) return;
 
   /* =========================
-   * ② フォーム構造切替（連絡種別）
-   * ========================= */
-  updateFormByType();
-
-  /* =========================
-   * ③ 日付表示（編集不可だが可視）
-   * ========================= */
-  if (selectedDate) {
-    const dateBox = document.getElementById("selectedDateBox");
-    if (dateBox) {
-      dateBox.textContent = selectedDate.replace(/-/g, "/");
-      dateBox.classList.add("disabled");
-    }
-  }
-
-  /* =========================
-   * ④ フォーム本体表示
-   * ========================= */
-  const body = document.getElementById("formBody");
-  if (body) body.style.display = "block";
-
-  /* =========================
    * ⑤ 理由
    * ========================= */
   if (d.reason) {
@@ -464,11 +442,33 @@ function restoreFormDetail(d) {
   }
 
   /* =========================
+   * ② フォーム構造切替（連絡種別）
+   * ========================= */
+  updateFormByType();
+
+  /* =========================
    * ⑬ 預かり保育／長期（お迎え時間再計算）
    * ========================= */
   if (["預かり保育", "長期"].includes(contactType)) {
     updatePickupForCare();
   }
+  /* =========================
+   * ③ 日付表示（編集不可だが可視）
+   * ========================= */
+  if (selectedDate) {
+    const dateBox = document.getElementById("selectedDateBox");
+    if (dateBox) {
+      dateBox.textContent = selectedDate.replace(/-/g, "/");
+      dateBox.classList.add("disabled");
+    }
+  }
+
+  /* =========================
+   * ④ フォーム本体表示
+   * ========================= */
+  const body = document.getElementById("formBody");
+  if (body) body.style.display = "block";
+
 }
 
 /****************************************************
@@ -746,36 +746,40 @@ function updateFormByType() {
     updatePickupForCare();
   }
   
+  // 給食エリアを表示すべきかどうかの判定フラグ
+  // 新規ならカレンダー定義、編集なら既にデータがあるかどうかも見る
+  const isLunchTarget = (calendarData?.lunchDates ?? []).includes(selectedDate);
+  // 編集モードで、かつ既に値がある場合も表示対象とする
+  const hasLunchData = (mode === "edit" && document.querySelector("input[name=lunch]:checked"));
+
+  // 欠席
   if (contactType === "欠席") {
     show("row-baggage");
-    if ((calendarData?.lunchDates ?? []).includes(selectedDate)) {
+    if (isLunchTarget || hasLunchData) {
       show("row-lunch");
+      // 欠席の場合は前述の通り「不要」固定
       const lunchRadios = document.querySelectorAll("input[name=lunch]");
       const lunchNo = document.querySelector("input[name=lunch][value='不要']");
-      
-      // ★ 追加：給食ありの日の欠席はデフォルト「不要」かつ「非活性」
-      if (lunchNo) {
-        lunchNo.checked = true;
-      }
-      lunchRadios.forEach(r => {
-        r.disabled = true; // ラジオボタンを操作不能にする
-      });
+      if (lunchNo) lunchNo.checked = true;
+      lunchRadios.forEach(r => r.disabled = true);
     }
   }
 
+  // 遅刻
   if (contactType === "遅刻") {
     show("row-send");
     setSendTimes();
-    if ((calendarData?.lunchDates ?? []).includes(selectedDate)) {
+    if (isLunchTarget || hasLunchData) {
       show("row-lunch");
     }
   }
 
+  // 早退
   if (contactType === "早退") {
     show("row-pickup");
     setPickupTimesForLeave();
     show("row-guardian");
-    if ((calendarData?.lunchDates ?? []).includes(selectedDate)) {
+    if (isLunchTarget || hasLunchData) {
       show("row-lunch");
     }
   }
