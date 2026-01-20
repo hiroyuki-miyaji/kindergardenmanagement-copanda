@@ -748,6 +748,9 @@ function updateFormByType() {
   
   if (contactType === "欠席") {
     show("row-baggage");
+    if ((calendarData?.lunchDates ?? []).includes(selectedDate)) {
+      show("row-lunch");
+    }
   }
 
   if (contactType === "遅刻") {
