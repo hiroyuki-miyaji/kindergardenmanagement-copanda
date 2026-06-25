@@ -347,9 +347,9 @@ function restoreFormDetail(d) {
   const send = document.getElementById("send");
   if (send && d.sendTime) send.value = d.sendTime;
 
-  // お迎え時間
-  const pickup = document.getElementById("pickup");
-  if (pickup && d.pickupTime) pickup.value = d.pickupTime;
+  // お迎え時間（option 再生成後に復元するため、ここでは値だけ控える）
+  // ※ 預かり保育・長期は updatePickupForCare() で option が作り直されるため、
+  //   復元はこの関数末尾（再計算後）で行う。
 
   // 保護者
   if (d.guardian) {
@@ -387,6 +387,10 @@ function restoreFormDetail(d) {
   if (["預かり保育", "長期"].includes(contactType)) {
     updatePickupForCare();
   }
+
+  // お迎え時間の復元（option 生成・再計算が終わった後に値をセット）
+  const pickup = document.getElementById("pickup");
+  if (pickup && d.pickupTime) pickup.value = d.pickupTime;
 
   // 日付表示（編集不可）
   if (selectedDate) {
@@ -969,7 +973,13 @@ function buildCommonPayload() {
 
   // 早退
   if (contactType === "早退") {
-    payload.pickupTime    = document.getElementById("pickup")?.value || null;
+    const pickupEl = document.getElementById("pickup");
+    if (pickupEl && pickupEl.offsetParent !== null && !pickupEl.value) {
+      alert("お迎え時間を選択してください。");
+      pickupEl.focus();
+      return null;
+    }
+    payload.pickupTime    = pickupEl?.value || null;
     payload.guardian      = document.querySelector("input[name=guardian]:checked")?.value || null;
     payload.guardianOther = document.getElementById("guardianOther")?.value || null;
   }
@@ -1002,8 +1012,11 @@ function buildCommonPayload() {
 // 新規送信用 Payload
 // ============================================================
 function buildSubmitPayload() {
+  const common = buildCommonPayload();
+  if (!common) return null;   // 早退のお迎え時間未選択など、共通チェックで中断
+
   const payload = {
-    ...buildCommonPayload(),
+    ...common,
     action:  "submit_contact",
     lineId: localStorage.getItem(window.storageKey("LINE_ID")) || null,
     date:    selectedDate,
@@ -1011,10 +1024,15 @@ function buildSubmitPayload() {
     busUser: selectedKid.busUser
   };
 
-  // お迎え時間（表示中の場合のみ）
+  // お迎え時間（表示中の場合のみ）：未選択はエラー
   const pickupEl = document.getElementById("pickup");
   if (pickupEl && pickupEl.offsetParent !== null) {
-    payload.pickupTime = pickupEl.value || null;
+    if (!pickupEl.value) {
+      alert("お迎え時間を選択してください。");
+      pickupEl.focus();
+      return null;
+    }
+    payload.pickupTime = pickupEl.value;
   }
 
   // 預かり保育・長期
@@ -1037,8 +1055,11 @@ function buildSubmitPayload() {
 // 更新用 Payload
 // ============================================================
 function buildUpdatePayload() {
+  const common = buildCommonPayload();
+  if (!common) return null;   // 早退のお迎え時間未選択など、共通チェックで中断
+
   return {
-    ...buildCommonPayload(),
+    ...common,
     action:    "update_contact",
     contactId,
     busUser:   selectedKid?.busUser ?? null
@@ -1154,14 +1175,23 @@ function setSendTimes() {
 }
 
 function setPickupTimesForLeave() {
-  setTimes("pickup", PICKUP_TIME.DEFAULT);
+  setTimes("pickup", PICKUP_TIME.DEFAULT, { placeholder: true });
 }
 
-function setTimes(id, list) {
+function setTimes(id, list, { placeholder = false } = {}) {
   const sel = document.getElementById(id);
   if (!sel) return;
   sel.innerHTML = "";
-  list.forEach(t => sel.insertAdjacentHTML("beforeend", `<option>${t}</option>`));
+  // お迎え時間などで初期値ブランク（未選択）を明示したい場合
+  if (placeholder) {
+    sel.insertAdjacentHTML(
+      "beforeend",
+      `<option value="" disabled selected>選択してください</option>`
+    );
+  }
+  list.forEach(t =>
+    sel.insertAdjacentHTML("beforeend", `<option value="${t}">${t}</option>`)
+  );
 }
 
 function updatePickupForCare() {
@@ -1202,5 +1232,5 @@ function updatePickupTimes() {
     }
   }
 
-  if (list.length) setTimes("pickup", list);
+  if (list.length) setTimes("pickup", list, { placeholder: true });
 }
